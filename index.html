@@ -25,6 +25,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, getDocs }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+         setPersistence, browserLocalPersistence, browserSessionPersistence }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyApxbTH_SHEbDa610HEfdrGS1TRLF3m_ro",
@@ -37,6 +40,29 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 const db    = getFirestore(fbApp);
+const auth  = getAuth(fbApp);
+
+// El acceso se comprueba contra Firebase, no en el navegador.
+window._auth = {
+  auth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  setPersistence, browserLocalPersistence, browserSessionPersistence,
+  // Ficha de acceso de quien ha entrado (nombre y rol)
+  async ficha(uid){
+    try{
+      const d = await getDoc(doc(db, 'acceso', uid));
+      return d.exists() ? d.data() : null;
+    }catch(e){ console.warn('acceso:', e.message); return null; }
+  },
+  // Listados de alumnado, que ya no viven en el codigo
+  async plantilla(){
+    const out = {};
+    try{
+      const snap = await getDocs(collection(db, 'plantilla'));
+      snap.forEach(d => { out[d.id] = (d.data().alumnos)||[]; });
+    }catch(e){ console.warn('plantilla:', e.message); }
+    return out;
+  }
+};
 
 // ── Guardar en Firestore ──────────────────────────────────────
 const docKey = cursoId => (S.anio || '2026-27') + '__' + cursoId;
@@ -401,12 +427,6 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
     <img src="data:image/png;base64,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" alt="Logotipo del CEIP Capitulaciones"/>
     <div class="lg-t">Registro de Lectura</div>
     <div class="lg-s">CEIP Capitulaciones de Santa Fe</div>
-
-    <div class="lg-f">
-      <label for="lgNombre">Maestro / maestra</label>
-      <select id="lgNombre"><option value="">Cargando lista…</option></select>
-    </div>
-
     <div class="lg-f">
       <label for="lgIdea">Usuario de Séneca (IdEA)</label>
       <input type="password" id="lgIdea" placeholder="p. ej. abcdef123" autocomplete="off"/>
@@ -553,14 +573,11 @@ let _uid=3000; function uid(){return ++_uid}
 // ══════════════════════════════════════════════════════════════
 // ALUMNOS INICIALES
 // ══════════════════════════════════════════════════════════════
-const INIT={
-  '1º':[],
-  '2º':['Aragón Castillo, Ana','Bueno Galán, Eiden','Cadar Cedeño, Irina','Espinosa Bonifacio, Leo','Fatoul Álvarez, Noa','Fdez Megías, Nacho','Gallegos Álvarez, Marco','Gómez Zorrilla, César','Jiménez Olmo, Martina','Lubián Piñar, Alejandra','Lubián, Paula','Martín Alcaraz, Lucas','Medina Medina, Gabriel','Montes Martín, Oliver','Moya Megías, Iván','Muñoz Román, Candela','Nicolás Contreras, Martín','Puga España, J. Manuel','Reyes Gutiérrez, Izan','Rodríguez Badenes, Fco R.','Rodríguez Fdez, Sergio','Rojas Márquez, Angelique','Rosillo Vargas, Valeria','Sola Rivas, Iván','Vargas Valdés, Carlos','Alcalá López, Martina','Arcas Cruz, Carmen','Corredera Díaz, Francisco Javier','Espínola García, Gonzalo','Fatoul Álvarez, Mia','Fernández Pimentel, Alejandro','Frías Heredia, Nerea','Gallo Ramos, Valeria','Gutiérrez López, Carla','Jiménez Guerrero, Ignacio','Linde Molina, Juan Carlos','López Narváez, Leonardo','Martínez García, Martín','Martos Pérez, Eric','Miranda Cabrero, Inés','Montilla Barea, Lucas','Moreno Gallegos, Emilio','Orellana Peña, Adrián','Ortuño Garzón, Claudia','Pinel Fernández, Ángel Manuel','Prados Gómez, Óliver','Rodríguez Tolón, Paula','Ruiz De Oliveira, Leo','Sáez Rodríguez, Carlos','Valero Balao, Alejandra'],
-  '3º':['Capilla Gómez, Alejandro','Cobos López, Nicolás','El Dib El Aroua, Ali','García Arias, Chloe','García García, Marisol','Gutiérrez Delgado, Martina','Jiménez Martínez, Mateo','López Castañeda, Alba','López Cervera, Alejandro','López Fernández, Alicia','López Martín, Enzo','Marín Romero, Dylan','Novo Martínez, Ana','Olea López, Juan Francisco','Pérez González, Thiago','Pesqueira García, Leo','Piron Juárez, Mathis','Prieto Ríos, Isabel','Puerta García, Zoe','Rodríguez Alcalde, Elvira','Rodríguez Veiga, Ana','Romero González, Triana','Ruiz Melgar, Valeria','Salamanca Vegas, Paula','Valverde Jiménez, Lucas','Vílchez Ligero, Manuel','Alba Ávila, Iris','Arroyo Claros, Leo','Cabeza Fajardo, Leo','Cantero Lupión, Aray','Cortés Pérez, Javier','Díaz Ávila, Triana','Díaz Tomás, Raúl','Escañuela Quero, Ana','Fernández Guerrero, Mª de las Nieves','Galán Ortiz, Lucía','Galera Adarve, Alicia','García Barranco, Hugo','Guerrero Le Ray, Emma','Linde Jódar, Antonio','Macías Teva, Fernando','Martín Gonella, Alba','Martín López, Rafael','Miranda Martín, Tiago','Morales González, Álex','Muela Sánchez, Ángela','Muñoz Ariza, Candela','Muñoz Ariza, María Isabel','Nadal Padial, Emma','Pardo Béjar, Mateo','Rodríguez Fajardo, Sarah','Sojo Pérez, Chloe'],
-  '4º':['Campos Ávila, José Antonio','Chamorro Martínez, Paco','Contreras Medina, Anna Paula','Díaz Segura, Nora','Espejo Cobo, Thiago','Fernández López, Sergio','García Molinero, Claudia','Gómez Contreras, Mateo','González Gómez, Nora','Hernández Castilla, Alejandra','Hernández Castilla, Candela','Jiménez Moliz, Victoria','López Narváez, Saúl José','Martín Calvo, Alejandro','Martínez Rivas, Catalina','Piñero Rupérez, Daniel','Quero Ruiz, Alejandro','Razzouk Jiménez, Suhaila','Rodríguez Jiménez, Hugo','Rodríguez Jiménez, Noa','Rosa Galiano, Alejandro','Sánchez Gallego, Mario','Sola Rivas, Ángela','Barone Rubio, Laila','Carrión Ruiz, Eloísa','Casado Listán, Leonardo','Castillo Hermosilla, Gonzalo','González Marín, Nerea','González Santos, Martina','Hackenberg Salazar, Leo','Heredia Ordóñez, Mario','Hernández López, Rodrigo','Jerónimo Jiménez, Miguel Campello','Martín Dueñas, Valeria','Millán Cervera, Valeria','Molina Gómez, Luis','Morales Sánchez, Alejandro','Novo Martínez, Pablo','Pérez Rivas, Dalia','Pérez Rivas, José Esteban','Porras Herrera, Elena','Ramírez López, David','Robles Carvajal, Alma','Ruiz De Oliveira, Ángel José','Ruiz Zúñiga, Marina','Sola Quero, Alejandro Antonio','Acebal Osuna, Oscar','Aranda Musso, Keysi','Boix González, Iván','Carmona Guerrero, Izan','Conde Martínez, Liam','Crudgington Montero, Sara','El Khalladi Pérez, Salma','Enríquez Rivas, Diego Alejandro','Fernández Aceituno, Alonso','Fernández García, Lucía','Fornelino Alarcón, Darío','García Molina, Martina','Juguera Rodríguez, Yasmín','López Espigares, Erick','Martín Aguado, Sofía','Martín Torres, Valeria','Méndez Tomé, Lucía','Navarro Sánchez, Carlos','Paula Alcántara, Fátima Ainhoa','Pérez Scocco, Nicola','Serrano Fernández, Daniel','Serrano Fernández, Noelia','Úbeda Mora, Hugo'],
-  '5º':['Alcalde Merino, Leo','Antúnez Guzmán, Valeria','Ariza Iáñez, Pablo','Arredondo Caracuel, Jimena','Baena Jiménez, María','Ballesteros Mata, Lorenzo','Barroso Vílchez, Hugo','Bello Moreno, Félix Matías','De los Santos Márquez, Leyre','Díaz López, Francisco','Es Solaymany klila, Elías','Guerrero Castillo, Martina','Jiménez Gómez, Miguel Ángel','Jiménez Jiménez, Alejandro','Jiménez Martín, Martín','López Gallardo, Alicia','López Ligero, Raúl','Palma González, Lucas','Rodríguez Veiga, Nicolás','Ruíz Molina, Hugo','Sánchez Girón, Álvaro','Sánchez Girón, David','Socarrás Calderón, Luciana','Solís Rodríguez, Macarena','Vargas Fernández-Arroyo, Blanca'],
-  '6º':['Aguilera Martínez, Iván','Anadon Cano, Andrea','Báez Enciso, Kevin','Ballesteros Mata, Juan Miguel','Carreta Moreno, Ángeles','Collado Espín, Arantxa','Coronado Fernández, Ismael','Corredera Díaz, Esther María','Díaz Tomás, Julia','Escañuela Quero, Nicolás','Espejo Cobo, Idaira','Fernández Ubiña, Hernán','García Carmona, Ismael','López Nieto, Jorge','Madrid Cirera, Noa','Martínez García, Antonio','Molina Jiménez, Eloy','Molina Talavera, Bruno','Moreno Herrera, Lucía','Ortega Pino, Alba','Ouchab, Almoatasim','Pérez Sánchez, Nuria','Povedano López, Javier','Reyes Cortés, Marcos','Rodríguez Tolón, Álvaro','Valverde Jiménez, Daniela','Vargas Valdés, Helena'],
-};
+// Los nombres del alumnado ya no van en el codigo: este fichero es publico
+// en GitHub Pages y cualquiera podia leerlos con «Ver codigo fuente».
+// Ahora se cargan de Firestore (coleccion `plantilla`) tras iniciar sesion.
+let INIT={'1º':[],'2º':[],'3º':[],'4º':[],'5º':[],'6º':[]};
+
 
 // ══════════════════════════════════════════════════════════════
 // ESTADO
@@ -1591,7 +1608,6 @@ Probablemente, pensaba, las dos cosas eran ciertas al mismo tiempo.`,
 // ══════════════════════════════════════════════════════════════
 // ACCESO · lista de personal compartida con Teletrabajo (RTDB)
 // ══════════════════════════════════════════════════════════════
-const RTDB_PERSONAL='https://teletrabajo-capitulaciones-default-rtdb.europe-west1.firebasedatabase.app/personal.json';
 const IDEA_DIRECCION='vunisal706';
 const SES_KEY='capi_registro_sesion';
 
@@ -1636,77 +1652,94 @@ function leerPersona(o){
   return {idea, nombre:nombre||pila||idea, pila:pila||(nombre.split(/[\s,]+/)[0]||idea)};
 }
 
-async function cargarPersonal(){
-  const sel=document.getElementById('lgNombre');
-  try{
-    const r=await fetch(RTDB_PERSONAL,{cache:'no-store'});
-    if(!r.ok)throw new Error('http '+r.status);
-    const data=await r.json();
-    const lista=[];
-    if(Array.isArray(data)) data.forEach(v=>{const p=leerPersona(v);if(p)lista.push(p)});
-    else if(data&&typeof data==='object') Object.values(data).forEach(v=>{const p=leerPersona(v);if(p)lista.push(p)});
-    PERSONAL=lista.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
-  }catch(e){
-    PERSONAL=[];
-    document.getElementById('lgAviso').style.display='block';
-  }
-  sel.innerHTML='<option value="">— Selecciona tu nombre —</option>';
-  PERSONAL.forEach((p,i)=>{
-    const o=document.createElement('option');
-    o.value=String(i); o.textContent=p.nombre;
-    sel.appendChild(o);
-  });
-  const o=document.createElement('option');
-  o.value='__DIR__'; o.textContent='⚙️ Dirección del centro';
-  sel.appendChild(o);
-}
+// El desplegable de nombres desaparecio: la identidad la verifica Firebase
+// a partir del IdEA. Asi esta app deja de depender del listado de personal
+// de Teletrabajo, que era publico.
 
-function entrar(){
-  const sel=document.getElementById('lgNombre');
+const LP_DOMINIO='@capitulaciones.local';
+
+async function entrar(){
   const idea=normIdea(document.getElementById('lgIdea').value);
   const err=document.getElementById('lgError');
   const recordar=document.getElementById('lgRecordar').checked;
+  const btn=document.getElementById('lgEntrar');
   err.textContent='';
-  if(!sel.value){err.textContent='⚠ Selecciona tu nombre en la lista.';return;}
   if(!idea){err.textContent='⚠ Escribe tu usuario de Séneca (IdEA), no la contraseña.';return;}
+  if(!window._auth){err.textContent='⚠ Sin conexión con el servidor de acceso.';return;}
 
-  if(sel.value==='__DIR__'){
-    if(idea!==IDEA_DIRECCION){err.textContent='⚠ Solo la dirección del centro puede acceder por aquí.';return;}
-    USUARIO={idea:IDEA_DIRECCION,nombre:'Dirección',pila:'Dirección'};
-  }else{
-    const p=PERSONAL[parseInt(sel.value)];
-    if(!p){err.textContent='⚠ No se ha podido leer ese nombre. Vuelve a seleccionarlo.';return;}
-    if(!p.idea){err.textContent='⚠ Esa persona aún no tiene usuario de Séneca en la lista. Añádelo desde Teletrabajo.';return;}
-    if(p.idea!==idea){err.textContent='⚠ El usuario no coincide. Escribe tu usuario de Séneca (IdEA), no la contraseña.';return;}
-    USUARIO=p;
+  btn.disabled=true; const txt=btn.textContent; btn.textContent='Comprobando…';
+  const A=window._auth;
+  try{
+    try{
+      await A.setPersistence(A.auth, recordar?A.browserLocalPersistence:A.browserSessionPersistence);
+    }catch(e){}
+
+    const cred=await A.signInWithEmailAndPassword(A.auth, idea+LP_DOMINIO, idea);
+    const ficha=await A.ficha(cred.user.uid);
+    if(!ficha){
+      await A.signOut(A.auth).catch(()=>{});
+      err.textContent='⚠ Tu cuenta no tiene acceso concedido. Habla con la dirección del centro.';
+      return;
+    }
+    const nombre=ficha.nombre||idea;
+    USUARIO={idea:idea,nombre:nombre,pila:(nombre.split(',')[1]||nombre).trim(),rol:ficha.rol||'docente'};
+    guardarSesion(USUARIO,recordar);
+    await abrirRegistro();
+  }catch(e){
+    console.warn('Acceso rechazado:',e&&e.code);
+    if(e.code==='auth/network-request-failed')      err.textContent='⚠ Sin conexión. Inténtalo de nuevo.';
+    else if(e.code==='auth/too-many-requests')      err.textContent='⚠ Demasiados intentos. Espera unos minutos.';
+    else if(e.code==='auth/user-not-found')         err.textContent='⚠ Esa cuenta no está dada de alta.';
+    else                                            err.textContent='⚠ El usuario IdEA no es correcto.';
+  }finally{
+    btn.disabled=false; btn.textContent=txt;
   }
-  guardarSesion(USUARIO,recordar);
-  abrirRegistro();
 }
 
-function abrirRegistro(){
+async function abrirRegistro(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('loading-screen').style.display='flex';
+  // Los listados de alumnado se leen ahora de Firestore, ya autenticados
+  try{
+    const pl = await window._auth.plantilla();
+    if(pl && Object.keys(pl).length) INIT = Object.assign(INIT, pl);
+  }catch(e){ console.warn('plantilla:', e); }
   const u=document.getElementById('user-chip');
   if(u){u.style.display='flex';document.getElementById('user-nombre').textContent=USUARIO?USUARIO.pila:'';}
   window._arrancar();
 }
 
 function salir(){
+  try{ if(window._auth) window._auth.signOut(window._auth.auth); }catch(e){}
   borrarSesion(); USUARIO=null;
   location.reload();
 }
 
 async function iniciarAcceso(){
-  await cargarPersonal();
+  // La sesión guardada en el navegador no basta: sin sesión de Firebase las
+  // reglas rechazan todo, así que se vuelve a pedir el acceso.
+  const A=window._auth;
+  const usuarioFb = await new Promise(res=>{
+    if(!A) return res(null);
+    let hecho=false;
+    const corta=setTimeout(()=>{ if(!hecho){hecho=true;res(A.auth.currentUser||null);} },6000);
+    A.onAuthStateChanged(A.auth, u=>{ if(hecho)return; hecho=true; clearTimeout(corta); res(u||null); });
+  });
+
   const s=leerSesion();
-  if(s&&s.idea){
-    // sesión válida si el IdEA sigue en la lista (o es dirección)
-    const sigue = s.idea===IDEA_DIRECCION || PERSONAL.some(p=>p.idea===s.idea) || PERSONAL.length===0;
-    if(sigue){USUARIO=s;abrirRegistro();return;}
+  if(usuarioFb){
+    const ficha=await A.ficha(usuarioFb.uid);
+    if(ficha){
+      const nombre=ficha.nombre||(s&&s.nombre)||'';
+      USUARIO={idea:(s&&s.idea)||'',nombre:nombre,pila:(nombre.split(',')[1]||nombre).trim(),rol:ficha.rol||'docente'};
+      await abrirRegistro();
+      return;
+    }
+    try{ await A.signOut(A.auth); }catch(e){}
   }
+  borrarSesion();
   document.getElementById('login-screen').style.display='flex';
-  document.getElementById('lgNombre').focus();
+  document.getElementById('lgIdea').focus();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2429,7 +2462,6 @@ window._arrancar=waitForFirebase;
 // ── acceso ──
 document.getElementById('lgEntrar').addEventListener('click',entrar);
 document.getElementById('lgIdea').addEventListener('keydown',e=>{if(e.key==='Enter')entrar()});
-document.getElementById('lgNombre').addEventListener('change',()=>{document.getElementById('lgError').textContent=''});
 document.getElementById('btn-salir').addEventListener('click',salir);
 (function(){
   const sa=document.getElementById('sel-anio');
