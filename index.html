@@ -245,6 +245,8 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
 .av0{background:rgba(79,126,248,0.14);color:#2563eb}.av1{background:rgba(139,92,246,0.14);color:#7c3aed}
 .av2{background:rgba(20,184,166,0.14);color:#0d9488}.av3{background:rgba(245,158,11,0.14);color:#d97706}
 .av4{background:rgba(239,68,68,0.14);color:#dc2626}.av5{background:rgba(34,197,94,0.14);color:#16a34a}
+.btn-renom-row{flex-shrink:0;width:32px;height:32px;border-radius:9px;border:1.5px solid rgba(200,215,240,0.7);background:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.btn-renom-row:hover{background:white;border-color:var(--accent)}
 .aname{flex:1;font-size:13px;font-weight:600;color:var(--text)}
 .pills{display:flex;gap:4px;flex-wrap:wrap}
 .pill{padding:2px 7px;border-radius:7px;font-size:10px;font-weight:800;font-family:'Nunito',sans-serif}
@@ -720,6 +722,7 @@ function viewNotas(){
       <div class="av av${i%6}">${ini}</div>
       <span class="aname">${sg}</span>
       <div class="pills">${pills}</div>
+      <button class="btn-renom-row" data-renom="${al.id}" title="Editar siglas" aria-label="Editar siglas de ${sg}">✏️</button>
     </div>`;
   }).join(''):`<p style="color:var(--text3);text-align:center;padding:36px 0;font-size:13px">Sin alumnos. Añade el primero ↓</p>`;
   return`<div class="card glass">
@@ -768,6 +771,7 @@ function editorAlumno(){
         <div style="font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sigla(al.nombre)}</div>
         <div style="font-size:11px;color:var(--text3)">${S.ca} · alumno ${idx+1} de ${als.length}</div>
       </div>
+      <button class="btns" id="btn-renom" title="Editar siglas" aria-label="Editar siglas" style="flex-shrink:0">✏️ Siglas</button>
       <div class="nav-al">
         <button class="bna" id="btn-prev" ${idx<=0?'disabled':''}>‹</button>
         <span class="napos">${idx+1}/${als.length}</span>
@@ -988,6 +992,8 @@ function bind(){
     b.addEventListener('click',()=>{S.ta=parseInt(b.dataset.trim);render();});
   });
   document.getElementById('btn-addal')?.addEventListener('click',()=>openModal('alumno'));
+  document.getElementById('btn-renom')?.addEventListener('click',()=>{renomId=S.ae;openModal('renombrar');});
+  document.querySelectorAll('[data-renom]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();renomId=parseInt(b.dataset.renom);openModal('renombrar');}));
   document.getElementById('btn-import')?.addEventListener('click',abrirImport);
   document.getElementById('btn-vaciarcl')?.addEventListener('click',()=>openModal('vaciar'));
   document.querySelectorAll('.at[data-alid]').forEach(btn=>{
@@ -999,7 +1005,7 @@ function bind(){
 }
 
 // ── MODAL ─────────────────────────────────────────────────────
-let mmode='';
+let mmode='';let renomId=null;
 function openModal(mode){
   mmode=mode;
   const t=document.getElementById('mt');
@@ -1016,6 +1022,12 @@ function openModal(mode){
     p.style.display='block';inp.style.display='none';ok.textContent='Sí, vaciar';
   }
   inp.value='';
+  if(mode==='renombrar'){
+    const al=alumnos().find(a=>a.id===renomId);
+    t.textContent='Editar siglas';inp.placeholder='Ej: G.L.M.';ok.textContent='Guardar';
+    p.textContent='Escribe las siglas (p. ej. GLM o G.L.M.) o el nombre completo; se guarda solo en siglas.';p.style.display='block';
+    inp.value=al?sigla(al.nombre):'';
+  }
   document.getElementById('modal').style.display='flex';
   if(mode!=='vaciar')setTimeout(()=>inp.focus(),60);
 }
@@ -1031,6 +1043,10 @@ function confirmModal(){
   }else if(mmode==='alumno'){
     if(!val)return;
     const c=curso();if(c){c.alumnos.push({id:uid(),nombre:sigla(val)});window._db?.scheduleSave(S.ca);}
+  }else if(mmode==='renombrar'){
+    const nuevo=normSigla(val);if(!nuevo)return;
+    const c=curso();const al=c&&c.alumnos.find(a=>a.id===renomId);
+    if(al){al.nombre=nuevo;window._db?.scheduleSave(S.ca);}
   }else if(mmode==='vaciar'){
     const c=curso();if(c){c.alumnos=[];c.notas={};S.ae=null;window._db?.scheduleSave(S.ca);}
   }
@@ -2074,6 +2090,19 @@ function agruparApellidos(txt){
 }
 
 function esSigla(v){ return /^([A-ZÁÉÍÓÚÑÜ]\.){1,3}(\s?\d+)?$/.test((v||'').trim()); }
+
+// Normaliza lo que escribe la maestra al editar: "glm", "G L M", "g.l.m." -> "G.L.M."
+function normSigla(v){
+  v=(v||'').trim();if(!v)return '';
+  const m=v.match(/^([A-Za-zÁÉÍÓÚÑÜáéíóúñü.\s]+?)\s*(\d+)?$/);
+  if(m&&!v.includes(',')){
+    const letras=m[1].replace(/[.\s]/g,'');
+    const sueltas=/[.\s]/.test(m[1].trim())||letras.length<=3;
+    if(letras.length>=1&&letras.length<=3&&sueltas)
+      return letras.toUpperCase().split('').map(l=>l+'.').join('')+(m[2]?' '+m[2]:'');
+  }
+  return sigla(v);
+}
 
 function sigla(nombre){
   const v=(nombre||'').trim();
