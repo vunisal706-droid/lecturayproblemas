@@ -585,7 +585,7 @@ let INIT={'1º':[],'2º':[],'3º':[],'4º':[],'5º':[],'6º':[]};
 // ESTADO
 // ══════════════════════════════════════════════════════════════
 let S={
-  cursos:{}, ca:'5º', ta:0, vista:'notas',
+  cursos:{}, ca:'5º', ta:0, vista:(location.hash==='#pruebas'?'pruebas':'notas'),
   anio:(function(){try{return localStorage.getItem('capi_registro_anio')||'2026-27'}catch(e){return '2026-27'}})(),
   evoCat:'media',
   ae:null, agraf:{},
@@ -1065,6 +1065,7 @@ function setVista(v){
   render();
 }
 document.querySelectorAll('.nb,.bb').forEach(b=>b.addEventListener('click',()=>setVista(b.dataset.view)));
+if(location.hash==='#pruebas') document.querySelectorAll('.nb,.bb').forEach(b=>b.classList.toggle('active',b.dataset.view==='pruebas'));
 
 // ── TECLADO ────────────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
