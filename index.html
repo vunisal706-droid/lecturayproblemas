@@ -554,6 +554,7 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
   </div>
 </div>
 
+<script src="pruebas-word.js?v=20261021b"></script>
 <script>
 // ══════════════════════════════════════════════════════════════
 // CONSTANTES
@@ -1793,56 +1794,95 @@ function lineasContadas(texto){
 
 
 // ── vista Pruebas ──
+const P_AREAS=[
+  {key:'lect', label:'📖 Lectura',   col:'#4f7ef8'},
+  {key:'calc', label:'🧮 Cálculo',   col:'#d97706'},
+  {key:'rp',   label:'🧩 Problemas', col:'#dc2626'},
+];
+function pArea(){try{return S.pArea||localStorage.getItem('capi_pruebas_area')||'lect'}catch(e){return S.pArea||'lect'}}
+function botonesDescarga(key){
+  return `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">
+    <button class="btnp" data-dl="${key}" data-tipo="alumno">⬇ Cuadernillo del alumnado</button>
+    <button class="btns" data-dl="${key}" data-tipo="maestro">⬇ Cuadernillo del maestro/a</button>
+  </div>`;
+}
 function viewPruebas(){
   const base=cursoBase(S.ca);
+  const area=pArea();
+  const tabs=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${P_AREAS.map(a=>
+    `<button class="chip${a.key===area?' active':''}" data-parea="${a.key}">${a.label}</button>`).join('')}</div>`;
   if(!base||!PRUEBAS[base]){
-    return `<div class="card glass"><div class="ct">📖 Pruebas de lectura</div>
+    return `<div class="card glass"><div class="ct">📖 Pruebas</div>
       <p style="color:var(--text3);font-size:13px">No hay pruebas asociadas al curso <b>${S.ca}</b>.
       Los nombres de curso deben empezar por el número de nivel (1º, 2º… 6º, o 3ºA, 5ºB).</p></div>`;
   }
+  const intro={
+    lect:'Una prueba por trimestre, con el mismo criterio de corrección en las tres.',
+    calc:'Dos partes por trimestre: <b>Parte 1 · cálculo mental</b> (10 ítems) y <b>Parte 2 · operaciones</b> (6). Cada parte da una nota de Cálculo en la app.',
+    rp:'Dos partes por trimestre: <b>Parte 1 · problemas de un paso</b> y <b>Parte 2 · problemas de dos pasos</b> (3 problemas cada una). Cada parte da una nota de Resolución de Problemas en la app.'
+  }[area];
   const cards=MOMENTOS.map(m=>{
-    const pr=PRUEBAS[base][m.key];
-    const obj=VLOBJ[base][m.key];
-    const np=palabras(pr.texto);
-    const tr=tramosVL(obj);
-    const baremo=tr.map(x=>`<tr><td>${x.min}${x.max===null?'+':'–'+x.max}</td><td>${x.lbl}</td><td style="text-align:right"><b>${x.nota}</b></td></tr>`).join('');
-    return `<div class="card glass" style="border-left:4px solid ${m.color}">
-      <div class="ct"><span class="cdot" style="background:${m.color}"></span>${m.label} · ${base}
-        <span style="margin-left:auto;font-size:11px;color:var(--text3);font-weight:600">${m.epoca}</span></div>
-      <div style="font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--text)">«${pr.titulo}»</div>
-      <div style="font-size:12px;color:var(--text2);margin:6px 0 12px">
-        ${np} palabras · ${pr.preguntas.length} preguntas · objetivo <b>${obj} ppm</b>
-      </div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="btnp" data-word="${m.key}">⬇ Descargar en Word</button>
-        <button class="btns" data-guia="${m.key}">📋 Ver guía rápida</button>
-      </div>
-      <div class="guia" id="guia-${m.key}" style="display:none">
-        <p class="gp"><b>1 · Aplicación.</b> Individual, 4–6 min. Lee en voz alta; marcas dónde llega al minuto pero le dejas terminar. Anotas errores (sustituciones, omisiones, adiciones, inversiones y palabras dictadas). Las autocorrecciones no cuentan.</p>
+    let det='', guia='';
+    if(area==='lect'){
+      const pr=PRUEBAS[base][m.key];
+      const obj=VLOBJ[base][m.key];
+      const tr=tramosVL(obj);
+      const baremo=tr.map(x=>`<tr><td>${x.min}${x.max===null?'+':'–'+x.max}</td><td>${x.lbl}</td><td style="text-align:right"><b>${x.nota}</b></td></tr>`).join('');
+      det=`<div style="font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:var(--text)">«${pr.titulo}»</div>
+        <div style="font-size:12px;color:var(--text2);margin:6px 0 12px">${palabras(pr.texto)} palabras · ${pr.preguntas.length} preguntas · objetivo <b>${obj} ppm</b></div>`;
+      guia=`<p class="gp"><b>1 · Aplicación.</b> Individual, 4–6 min. Lee en voz alta; marcas dónde llega al minuto pero le dejas terminar. Anotas errores (sustituciones, omisiones, adiciones, inversiones y palabras dictadas). Las autocorrecciones no cuentan.</p>
         <p class="gp"><b>2 · Velocidad lectora.</b> PPM = palabras del primer minuto − errores.</p>
         <table class="gtab"><tr><th>PPM</th><th>Valoración</th><th>Nota</th></tr>${baremo}</table>
         <p class="gp"><b>3 · Comprensión.</b> ${pr.preguntas.length} preguntas × ${(10/pr.preguntas.length).toFixed(2)} puntos. Completa / mitad / cero. Nota = (puntos ÷ ${pr.preguntas.length}) × 10.</p>
         <p class="gp"><b>4 · Expresión oral.</b> «Cuéntame el texto con tus palabras». Contenido, orden, vocabulario y fluidez: 2,5 puntos cada uno.</p>
-        <p class="gp"><b>5 · Volcado en la app.</b> Curso <b>${base}</b> → ${m.corto} → pulsa el nombre del alumno/a → escribe VL, CL y EO. Se guarda solo. Las ppm se archivan en la hoja de registro en papel.</p>
-        <p class="gp" style="color:#d97706"><b>Ojo:</b> en la app va la nota de 0 a 10, no las palabras por minuto.</p>
-      </div>
+        <p class="gp"><b>5 · Volcado en la app.</b> Curso <b>${base}</b> → ${m.corto} → pulsa el nombre del alumno/a → escribe VL, CL y EO.</p>`;
+    }else if(area==='calc'){
+      const pr=PRUEBAS_CALC[base][m.key];
+      det=`<div style="font-size:12.5px;color:var(--text2);margin:2px 0 12px;line-height:1.5"><b>Qué mide:</b> ${pr.contenidos}</div>`;
+      guia=`<p class="gp"><b>Parte 1 · Cálculo mental.</b> 10 ítems × 1 punto. ${(base==='1º'||base==='2º')?'El maestro/a lee cada ítem en voz alta.':'Tiempo: '+pr.tiempo+' minutos.'}</p>
+        <p class="gp"><b>Parte 2 · Operaciones.</b> 6 operaciones: correcta 1 · proceso bien con un error de cálculo 0,5. Nota = puntos ÷ 6 × 10.</p>
+        <p class="gp"><b>Volcado.</b> Cálculo → ＋ Añadir nota: Nota 1 = Parte 1 · Nota 2 = Parte 2.</p>`;
+    }else{
+      const pr=PRUEBAS_RP[base][m.key];
+      det=`<div style="font-size:12.5px;color:var(--text2);margin:2px 0 12px;line-height:1.5"><b>Qué mide:</b> ${pr.contenidos}</div>`;
+      guia=`<p class="gp"><b>Corrección.</b> Cada problema 4 puntos: comprende, planifica, calcula y responde. Cada parte suma 12. Nota = puntos ÷ 12 × 10.</p>
+        <p class="gp"><b>Volcado.</b> Resolución de Problemas → ＋ Añadir nota: Nota 1 = Parte 1 · Nota 2 = Parte 2.</p>`;
+    }
+    return `<div class="card glass" style="border-left:4px solid ${m.color}">
+      <div class="ct"><span class="cdot" style="background:${m.color}"></span>${m.label} · ${base}
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);font-weight:600">${m.epoca}</span></div>
+      ${det}${botonesDescarga(m.key)}
+      <button class="btns" data-guia="${m.key}" style="margin-bottom:4px">📋 Ver guía rápida</button>
+      <div class="guia" id="guia-${m.key}" style="display:none">${guia}</div>
     </div>`;
   }).join('');
-
   return `<div class="card glass">
-      <div class="ct">📖 Pruebas de lectura · ${S.ca}</div>
-      <p style="font-size:12.5px;color:var(--text2);line-height:1.55;margin:0">
-        Una prueba por trimestre, con el mismo criterio de corrección en las tres. El Word incluye el texto del alumnado
-        con el recuento de palabras al margen, las preguntas, la guía de corrección, los baremos
-        y la hoja de registro con la lista de tu clase ya puesta.</p>
+      <div class="ct">🗂️ Pruebas · ${S.ca}</div>
+      ${tabs}
+      <p style="font-size:12.5px;color:var(--text2);line-height:1.55;margin:0 0 10px">${intro}
+        Cada prueba se descarga en <b>dos documentos</b>: el <b>cuadernillo del alumnado</b>, listo para fotocopiar,
+        y el <b>cuadernillo del maestro/a</b>, con la guía, las soluciones y la hoja de registro con tu lista de clase.</p>
+      <div style="font-size:12px;font-weight:800;color:var(--text2);margin-bottom:6px">Los tres trimestres juntos:</div>
+      ${botonesDescarga('todo')}
     </div>${cards}`;
 }
 
 function bindPruebas(){
-  document.querySelectorAll('[data-word]').forEach(b=>{
+  document.querySelectorAll('[data-parea]').forEach(b=>{
     b.addEventListener('click',()=>{
+      S.pArea=b.dataset.parea;
+      try{localStorage.setItem('capi_pruebas_area',S.pArea)}catch(e){}
+      render();
+    });
+  });
+  document.querySelectorAll('[data-dl]').forEach(b=>{
+    b.addEventListener('click',async()=>{
+      const keys=b.dataset.dl==='todo'?TS.slice():[b.dataset.dl];
+      const fn={lect:generarWord,calc:generarCalculoWord,rp:generarProblemasWord}[pArea()];
       b.disabled=true;const t=b.textContent;b.textContent='Generando…';
-      try{generarWord(S.ca)}finally{setTimeout(()=>{b.disabled=false;b.textContent=t},700)}
+      try{await fn(S.ca,keys,b.dataset.tipo)}
+      catch(e){console.error(e);alert('No se ha podido generar el documento.')}
+      finally{setTimeout(()=>{b.disabled=false;b.textContent=t},700)}
     });
   });
   document.querySelectorAll('[data-guia]').forEach(b=>{
@@ -2134,198 +2174,7 @@ function siglasUnicas(lista){
   return out;
 }
 
-// ══════════════════════════════════════════════════════════════
-// DOCUMENTO WORD · una ficha por hoja
-// ══════════════════════════════════════════════════════════════
-function generarWord(cursoId){
-  const base=cursoBase(cursoId);
-  if(!base||!PRUEBAS[base]){alert('No hay prueba definida para este curso.');return;}
-  const c=S.cursos[cursoId];
-  const als=(c&&c.alumnos)?c.alumnos:[];
-  const peque=(base==='1º'||base==='2º');
-  const fz   = peque?'19pt' : (base==='3º'||base==='4º') ? '15pt' : '13pt';
-  const lh   = peque?'2.4'  : (base==='3º'||base==='4º') ? '2.0'  : '1.8';
-  const alto = peque?'34px' : '26px';
-
-  const cab=(m)=>`<table style="width:100%;border-collapse:collapse;margin-bottom:10px">
-    <tr><td style="font-size:9pt;color:#666;border-bottom:2px solid #4f7ef8;padding-bottom:4px">
-      CEIP CAPITULACIONES DE SANTA FE · PLAN DE LECTURA
-    </td><td style="font-size:9pt;color:#666;text-align:right;border-bottom:2px solid #4f7ef8;padding-bottom:4px">
-      ${cursoId} · ${m.corto} · ${anioLabel(S.anio)}
-    </td></tr></table>`;
-
-  const datosAlumno=`<table style="width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:11pt">
-    <tr><td style="border:1px solid #bbb;padding:8px">Nombre: </td>
-        <td style="border:1px solid #bbb;padding:8px;width:170px">Fecha: ___ / ___ / _____</td></tr></table>`;
-
-  const hoja=(contenido,ultima)=>`<div${ultima?'':' style="page-break-after:always"'}>${contenido}</div>`;
-
-  const bloques=MOMENTOS.map((m,mi)=>{
-    const pr=PRUEBAS[base][m.key];
-    const obj=VLOBJ[base][m.key];
-    const np=palabras(pr.texto);
-    const lin=lineasContadas(pr.texto);
-    const tr=tramosVL(obj);
-
-    // ── FICHA 1 · texto para el alumnado ──
-    const textoLimpio=pr.texto.split('\n').filter(l=>l.trim())
-      .map(l=>`<p style="font-size:${fz};line-height:${lh};margin:0 0 2px">${l.trim()}</p>`).join('');
-    const ficha1=cab(m)+
-      `<h2 style="text-align:center;font-size:17pt;margin:6px 0 2px">${pr.titulo}</h2>
-       <p style="text-align:center;font-size:10pt;color:#777;margin:0">Lectura en voz alta</p>`+
-      datosAlumno+
-      `<div style="border:1px solid #ddd;border-radius:6px;padding:16px 18px">${textoLimpio}</div>`;
-
-    // ── HOJA DE LECTURA · copia del maestro/a ──
-    const filasTexto=lin.map(l=>
-      `<tr><td style="padding:5px 10px;font-size:${peque?'15pt':'12pt'};line-height:1.9">${l.t}</td>
-           <td style="width:54px;text-align:right;color:#999;font-size:9pt;border-left:1px dotted #bbb">${l.n}</td></tr>`).join('');
-    const hojaLectura=cab(m)+
-      `<h3 style="color:#4f7ef8;margin:4px 0 2px">Hoja de lectura · copia del maestro/a</h3>
-       <p style="font-size:10pt;color:#555;margin:0 0 10px">
-       «${pr.titulo}» · ${np} palabras · objetivo del nivel: <b>${obj} ppm</b>.
-       Marca con una barra ( / ) la palabra en la que se encuentra al cumplirse el minuto, pero deja que termine el texto.
-       La columna de la derecha da las palabras acumuladas al final de cada línea.</p>
-       <p style="font-size:10pt;color:#555;margin:0 0 10px">Alumno/a: _____________________________________ Fecha: ___ / ___ / _____</p>
-       <table style="width:100%;border-collapse:collapse;border:1px solid #ddd">${filasTexto}</table>
-       <table style="width:100%;border-collapse:collapse;margin-top:16px;font-size:11pt" border="1" cellpadding="8">
-         <tr><td style="width:34%">Palabras en 1 minuto</td><td style="width:33%">Errores</td><td>PPM correctas</td></tr>
-         <tr><td style="height:34px"></td><td></td><td></td></tr>
-       </table>
-       <p style="font-size:10pt;color:#555;margin-top:8px">Errores: sustituciones, omisiones, adiciones, inversiones y palabras dictadas. Las autocorrecciones inmediatas no cuentan.</p>`;
-
-    // ── FICHA 2 · preguntas para el alumnado ──
-    const filasPreg=pr.preguntas.map((q,i)=>
-      `<tr><td style="width:26px;font-weight:bold;font-size:${peque?'14pt':'12pt'};vertical-align:top;padding-top:6px">${i+1}.</td>
-           <td style="padding-bottom:10px"><span style="font-size:${peque?'14pt':'12pt'}">${q.p}</span>
-           <div style="border-bottom:1px dotted #999;height:${alto}"></div>
-           <div style="border-bottom:1px dotted #999;height:${alto}"></div>${peque?'':'<div style="border-bottom:1px dotted #999;height:'+alto+'"></div>'}</td></tr>`).join('');
-    const ficha2=cab(m)+
-      `<h2 style="text-align:center;font-size:17pt;margin:6px 0 2px">${pr.titulo}</h2>
-       <p style="text-align:center;font-size:10pt;color:#777;margin:0">Comprensión lectora</p>`+
-      datosAlumno+
-      `<p style="font-size:10pt;color:#666;margin:0 0 10px">${peque?'Escucha bien la pregunta y responde.':'Puedes volver a leer el texto si lo necesitas. Responde con frases completas.'}</p>
-       <table style="width:100%;border-collapse:collapse">${filasPreg}</table>`;
-
-    // ── GUÍA · hoja 1 ──
-    const filasBaremo=tr.map(x=>
-      `<tr><td>${x.min}${x.max===null?' o más':' – '+x.max} ppm</td><td>${x.lbl}</td><td style="text-align:center"><b>${x.nota}</b></td></tr>`).join('');
-    const guia1=cab(m)+
-      `<h3 style="color:#4f7ef8;margin:4px 0 10px">Guía del maestro/a (1 de 2) · aplicación y velocidad lectora</h3>
-      <h4>1 · Cómo se aplica</h4>
-      <ol style="font-size:11pt;line-height:1.5">
-        <li><b>Individualmente</b>, fuera del aula o en un rincón tranquilo. Entre 4 y 6 minutos por alumno/a.</li>
-        <li>Entrega la <b>ficha del texto</b> al alumno/a. Tú usas la <b>hoja de lectura</b> para cronometrar y anotar.</li>
-        <li>Consigna literal: <i>«Vas a leer este texto en voz alta. Léelo como tú sabes, sin correr. Cuando termines te haré unas preguntas.»</i> No se le dice que se le cronometra, para no inducir prisa.</li>
-        <li>Cronómetro al empezar la primera palabra. Al minuto exacto marcas una barra, pero <b>le dejas terminar</b>.</li>
-        <li>Retira el texto y entrega la <b>ficha de preguntas</b>.${peque?' En 1º y 2º las preguntas se hacen <b>oralmente</b> y las respuestas las anotas tú en la ficha.':''}</li>
-        <li>Termina pidiéndole que cuente el texto con sus palabras: eso es lo que valoras en expresión oral.</li>
-      </ol>
-      <h4>2 · Velocidad lectora (VL)</h4>
-      <p style="font-size:11pt;margin:0 0 8px"><b>PPM correctas = palabras leídas en 1 minuto − errores.</b></p>
-      <table style="width:100%;border-collapse:collapse;font-size:11pt" border="1" cellpadding="5">
-        <tr style="background:#eef3ff"><th>PPM correctas</th><th>Valoración</th><th>Nota (0–10)</th></tr>
-        ${filasBaremo}
-      </table>
-      <p style="font-size:10pt;color:#555;margin-top:8px">Baremo del centro para ${base}, ${m.corto}, con <b>${obj} ppm</b> como objetivo.
-      Los objetivos de 1º y 2º están ajustados a la baja respecto a las tablas generales, teniendo en cuenta el contexto del centro (Zona de Transformación Social).
-      Puedes matizar la nota medio punto según entonación, respeto de las pausas y fluidez.</p>`;
-
-    // ── GUÍA · hoja 2 ──
-    const filasClave=pr.preguntas.map((q,i)=>
-      `<tr><td style="width:24px">${i+1}</td><td style="width:82px;color:#4f7ef8"><b>${q.t}</b></td><td>${q.r}</td></tr>`).join('');
-    const guia2=cab(m)+
-      `<h3 style="color:#4f7ef8;margin:4px 0 10px">Guía del maestro/a (2 de 2) · comprensión, expresión oral y volcado</h3>
-      <h4>3 · Comprensión lectora (CL)</h4>
-      <p style="font-size:11pt;margin:0 0 8px">${pr.preguntas.length} preguntas × <b>${(10/pr.preguntas.length).toFixed(2)} puntos</b>: completa (todo), parcial (la mitad), incorrecta o en blanco (0).
-      Las preguntas <i>Personal</i> o <i>Crítica</i> se puntúan por la coherencia del razonamiento, no por la opinión.
-      <b>Nota CL = (puntos ÷ ${pr.preguntas.length}) × 10.</b></p>
-      <table style="width:100%;border-collapse:collapse;font-size:10.5pt" border="1" cellpadding="4">
-        <tr style="background:#eef3ff"><th>Nº</th><th>Tipo</th><th>Respuesta orientativa</th></tr>
-        ${filasClave}
-      </table>
-      <h4>4 · Expresión oral (EO)</h4>
-      <p style="font-size:11pt;margin:0 0 6px">«Cuéntame de qué trata el texto, con tus palabras». Cuatro aspectos de 2,5 puntos.</p>
-      <table style="width:100%;border-collapse:collapse;font-size:10.5pt" border="1" cellpadding="4">
-        <tr style="background:#eef3ff"><th>Aspecto</th><th>0 – 1</th><th>1,5</th><th>2 – 2,5</th></tr>
-        <tr><td><b>Contenido</b></td><td>Datos sueltos o erróneos</td><td>Idea general sin detalles</td><td>Idea principal y detalles</td></tr>
-        <tr><td><b>Orden</b></td><td>Sin secuencia clara</td><td>Orden con algún salto</td><td>Principio, desarrollo y final</td></tr>
-        <tr><td><b>Vocabulario</b></td><td>Muy pobre o repetitivo</td><td>Correcto y sencillo</td><td>Preciso, usa palabras del texto</td></tr>
-        <tr><td><b>Fluidez</b></td><td>Muchas pausas y muletillas</td><td>Alguna vacilación</td><td>Continuo y bien entonado</td></tr>
-      </table>
-      <h4>5 · Cómo se meten los datos en la app</h4>
-      <ol style="font-size:11pt;line-height:1.5">
-        <li>Entra en <b>Registro</b>, elige el curso escolar <b>${anioLabel(S.anio)}</b>, el curso <b>${cursoId}</b> y el <b>${m.corto}</b>.</li>
-        <li>Pulsa sobre las siglas del alumno/a para abrir su ficha.</li>
-        <li>Escribe la nota de <b>Velocidad Lectora</b>, la de <b>Comprensión Lectora</b> y la de <b>Expresión Oral</b>. Admite decimales.</li>
-        <li>Se guarda solo: verás <i>Guardando…</i> y después <i>Guardado</i> arriba a la derecha.</li>
-        <li>En <b>Evolución</b> tienes la comparación entre los tres trimestres por alumno, por curso y del centro.</li>
-      </ol>
-      <p style="font-size:10pt;color:#555"><b>Importante:</b> en la app se guarda la nota de 0 a 10, no las ppm. Las ppm quedan en la hoja de registro de papel, que es lo que permite comparar los tres trimestres.</p>`;
-
-    // ── HOJA DE REGISTRO DEL GRUPO ──
-    const nombres=siglasUnicas(als.map(a=>a.nombre));
-    const filasRegistro=(nombres.length?nombres:new Array(14).fill(''))
-      .map(n=>`<tr><td style="height:23px">${n}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`).join('');
-    const registro=cab(m)+
-      `<h3 style="color:#4f7ef8;margin:4px 0 6px">Hoja de registro del grupo · ${cursoId} · ${m.corto}</h3>
-       <p style="font-size:10pt;color:#555;margin:0 0 10px">Fecha de aplicación: ___ / ___ / _____ &nbsp;&nbsp; Maestro/a: ___________________________ &nbsp;&nbsp; Objetivo: <b>${obj} ppm</b></p>
-       <table style="width:100%;border-collapse:collapse;font-size:10pt" border="1" cellpadding="4">
-         <tr style="background:#eef3ff">
-           <th style="width:22%">Alumno/a</th><th>Palabras<br/>1 min</th><th>Errores</th><th>PPM</th><th>Nota VL</th><th>Nota CL</th><th>Nota EO</th>
-         </tr>
-         ${filasRegistro}
-       </table>
-       <p style="font-size:9.5pt;color:#777;margin-top:10px">Documento con datos del alumnado: archívese en el expediente del Plan de Lectura.</p>`;
-
-    const ultima=(mi===MOMENTOS.length-1);
-    return hoja(ficha1)+hoja(hojaLectura)+hoja(ficha2)+hoja(guia1)+hoja(guia2)+hoja(registro,ultima);
-  }).join('');
-
-  const portada=`<div style="page-break-after:always">
-    <table style="width:100%;border-bottom:3px solid #4f7ef8;padding-bottom:8px;margin-bottom:16px">
-      <tr><td>
-        <h1 style="color:#4f7ef8;margin:0">CEIP Capitulaciones de Santa Fe</h1>
-        <div style="font-size:11pt;color:#555">Plan de Lectura · Evaluación de la competencia lectora</div>
-        <div style="font-size:11pt;color:#555"><b>Curso ${cursoId}</b> · Curso escolar ${anioLabel(S.anio)} · Código de centro 18008853</div>
-      </td></tr>
-    </table>
-    <p style="font-size:11pt;line-height:1.6">Este cuadernillo contiene las <b>tres pruebas del curso</b>, una por trimestre.
-    Cada prueba ocupa seis hojas independientes, pensadas para imprimir y usar tal cual:</p>
-    <table style="width:100%;border-collapse:collapse;font-size:11pt" border="1" cellpadding="6">
-      <tr style="background:#eef3ff"><th style="width:30%">Hoja</th><th>Para quién</th><th>Contenido</th></tr>
-      <tr><td><b>1 · Ficha de lectura</b></td><td>Alumnado</td><td>Solo el texto, en letra grande</td></tr>
-      <tr><td><b>2 · Hoja de lectura</b></td><td>Maestro/a</td><td>El mismo texto con el recuento de palabras y las casillas de errores y ppm</td></tr>
-      <tr><td><b>3 · Ficha de preguntas</b></td><td>Alumnado</td><td>Preguntas de comprensión con espacio para responder</td></tr>
-      <tr><td><b>4 y 5 · Guía</b></td><td>Maestro/a</td><td>Aplicación, baremos, plantilla de respuestas, rúbrica y volcado en la app</td></tr>
-      <tr><td><b>6 · Hoja de registro</b></td><td>Maestro/a</td><td>Tabla del grupo para anotar los datos de todos</td></tr>
-    </table>
-    <p style="font-size:11pt;line-height:1.6;margin-top:14px">Índice de textos:</p>
-    <table style="width:100%;border-collapse:collapse;font-size:11pt" border="1" cellpadding="6">
-      <tr style="background:#eef3ff"><th>Trimestre</th><th>Texto</th><th>Palabras</th><th>Objetivo</th></tr>
-      ${MOMENTOS.map(m=>{const pr=PRUEBAS[base][m.key];
-        return `<tr><td>${m.corto} <span style="color:#777">(${m.epoca})</span></td><td>«${pr.titulo}»</td><td style="text-align:center">${palabras(pr.texto)}</td><td style="text-align:center">${VLOBJ[base][m.key]} ppm</td></tr>`;}).join('')}
-    </table>
-  </div>`;
-
-  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-<head><meta charset="utf-8"/><title>Pruebas de lectura ${cursoId} ${anioLabel(S.anio)}</title>
-<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
-<style>
- @page{size:A4;margin:1.8cm}
- body{font-family:'Calibri','Arial',sans-serif;color:#1a2340}
- h1{font-size:18pt} h2{font-size:16pt} h3{font-size:13pt} h4{font-size:12pt;color:#4f7ef8;margin:14px 0 5px}
- p{margin:0 0 8px}
- table{border-color:#ccc}
-</style></head><body>${portada}${bloques}</body></html>`;
-
-  const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`Pruebas_lectura_${cursoId.replace(/[^\w]/g,'')}_${S.anio}_Capitulaciones.doc`;
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
-}
+// (Los documentos Word se generan en pruebas-word.js)
 
 // ══════════════════════════════════════════════════════════════
 // IMPORTAR ALUMNADO DESDE EL EXCEL DE SÉNECA (solo dirección)
@@ -2513,6 +2362,24 @@ document.getElementById('imp-curso').addEventListener('change',e=>{
 });
 document.getElementById('btn-salir-demo').addEventListener('click',()=>location.reload());
 iniciarAcceso();
+// ── Aviso de novedades (sale una sola vez en cada dispositivo) ──
+(function(){
+  const ID='2026-10-21';
+  try{ if(localStorage.getItem('capi_lyp_novedades')===ID) return; }catch(e){}
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px';
+  d.innerHTML=`<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:Nunito,sans-serif;color:#1a2340">
+    <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades en Pruebas</div>
+    <ul style="font-size:13.5px;line-height:1.55;margin:0 0 14px;padding-left:18px">
+      <li>Cada prueba se descarga en <b>dos documentos</b>: <b>cuadernillo del alumnado</b> (para fotocopiar) y <b>cuadernillo del maestro/a</b> (guía, soluciones y registro).</li>
+      <li>Puedes descargar <b>un trimestre</b> o <b>los tres juntos</b>.</li>
+      <li>Nuevas pruebas de <b>Cálculo</b> y de <b>Resolución de problemas</b> para cada curso y trimestre.</li>
+      <li>Los documentos llevan el <b>logo del colegio</b>.</li>
+    </ul>
+    <button style="width:100%;border:none;border-radius:12px;padding:10px;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,#4f7ef8,#7c9edf);cursor:pointer">Entendido</button></div>`;
+  d.querySelector('button').onclick=()=>{try{localStorage.setItem('capi_lyp_novedades',ID)}catch(e){} d.remove();};
+  document.body.appendChild(d);
+})();
 </script>
 </body>
 </html>
