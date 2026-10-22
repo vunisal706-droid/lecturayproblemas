@@ -554,7 +554,7 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
   </div>
 </div>
 
-<script src="pruebas-word.js?v=20261021b"></script>
+<script src="pruebas-word.js?v=20261022"></script>
 <script>
 // ══════════════════════════════════════════════════════════════
 // CONSTANTES
@@ -2364,13 +2364,14 @@ document.getElementById('btn-salir-demo').addEventListener('click',()=>location.
 iniciarAcceso();
 // ── Aviso de novedades (sale una sola vez en cada dispositivo) ──
 (function(){
-  const ID='2026-10-21';
+  const ID='2026-10-22';
   try{ if(localStorage.getItem('capi_lyp_novedades')===ID) return; }catch(e){}
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px';
   d.innerHTML=`<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:Nunito,sans-serif;color:#1a2340">
     <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades en Pruebas</div>
     <ul style="font-size:13.5px;line-height:1.55;margin:0 0 14px;padding-left:18px">
+      <li>Cálculo y Problemas tienen <b>Parte 1 y Parte 2</b>: dos hojas que se pasan en dos sesiones y dan la <b>Nota 1</b> y la <b>Nota 2</b> en la app. Lo explica la guía del maestro/a.</li>
       <li>Cada prueba se descarga en <b>dos documentos</b>: <b>cuadernillo del alumnado</b> (para fotocopiar) y <b>cuadernillo del maestro/a</b> (guía, soluciones y registro).</li>
       <li>Puedes descargar <b>un trimestre</b> o <b>los tres juntos</b>.</li>
       <li>Nuevas pruebas de <b>Cálculo</b> y de <b>Resolución de problemas</b> para cada curso y trimestre.</li>

@@ -327,7 +327,7 @@ async function generarCalculoWord(cursoId, keys, tipo){
       for(let i = 0; i < pr.mental.length; i += 2){
         filas.push([item(pr.mental[i], i), caja(), hueco(), item(pr.mental[i + 1], i + 1), caja()]);
       }
-      hojas.push(hoja(cab(m), [...pwTitulo('Cálculo · Parte 1', 'Cálculo mental'), ...pwDatosAlumno(),
+      hojas.push(hoja(cab(m), [...pwTitulo('Cálculo · Parte 1 de 2', 'Cálculo mental: resultados de cabeza'), ...pwDatosAlumno(),
         P(peque ? 'Escucha y escribe el resultado en la casilla.' : 'Calcula de cabeza y escribe solo el resultado en la casilla. No hagas la cuenta en el papel.', { sz: peque ? 13 : 11, c: '#444444', after: 160 }),
         T(filas, { anchos: [3432, 1300, 400, 3432, 1300], bordes: 'none', alto: peque ? 1000 : 900 })]));
 
@@ -336,7 +336,7 @@ async function generarCalculoWord(cursoId, keys, tipo){
       const celdaOp = (o, i) => C([P(String.fromCharCode(97 + i) + ')', { sz: 10, c: '#777777', after: 60 }), pwOperacion(o, szo)], { w: 3288, borders: bordes('all', 'CCCCCC') });
       const ops = pr.escrito;
       const instr = 'Haz las operaciones en su recuadro.' + (ops.some(o => o.t === 'h') ? ' Escribe los pasos y el resultado final.' : '') + (ops.some(o => o.t === 'd') ? ' En las divisiones, escribe el cociente y el resto.' : '');
-      hojas.push(hoja(cab(m), [...pwTitulo('Cálculo · Parte 2', 'Operaciones'), ...pwDatosAlumno(),
+      hojas.push(hoja(cab(m), [...pwTitulo('Cálculo · Parte 2 de 2', 'Operaciones por escrito'), ...pwDatosAlumno(),
         P(instr, { sz: peque ? 13 : 11, c: '#444444', after: 160 }),
         T([ops.slice(0, 3).map((o, i) => celdaOp(o, i)), ops.slice(3, 6).map((o, i) => celdaOp(o, i + 3))], { anchos: [3288, 3288, 3288], alto, color: 'CCCCCC' })]));
       return;
@@ -346,6 +346,13 @@ async function generarCalculoWord(cursoId, keys, tipo){
     hojas.push(hoja(cab(m), [
       H(`Guía del maestro/a · Prueba de cálculo · ${base} · ${m.corto}`, COL, 13, { before: 0 }),
       P(`**Qué mide:** ${pr.contenidos}`, { sz: 10.5, c: '#555555' }),
+      H('¿Qué son la Parte 1 y la Parte 2?', COL, 12),
+      P('La prueba de cálculo tiene **dos partes**, en dos hojas distintas del cuadernillo del alumnado. Se pasan en **dos sesiones** (o con un descanso) para no cansar al alumnado, y **cada parte da una nota** en la app:', { sz: 11 }),
+      T([['Parte', 'Qué hace el alumno/a', 'Nota en la app'],
+         ['**Parte 1 · Cálculo mental**', '10 operaciones cortas que resuelve de cabeza y solo escribe el resultado.', 'Nota 1 de Cálculo'],
+         ['**Parte 2 · Operaciones**', '6 operaciones por escrito (sumas, restas, multiplicaciones o divisiones, según el curso).', 'Nota 2 de Cálculo']],
+        { anchos: [2600, 4964, 2300], cabecera: '#FFF4E0', celda: { sz: 10.5 } }),
+      P('Así la media del trimestre recoge las dos destrezas: el cálculo rápido y las operaciones con su procedimiento.', { sz: 10.5, c: '#555555', before: 80 }),
       H('1 · Cómo se aplica', COL, 12),
       ...lista([
         'Colectiva, en el aula. Mejor en **dos sesiones** (un día cada parte) o con un descanso entre ellas.',
@@ -418,7 +425,7 @@ async function generarProblemasWord(cursoId, keys, tipo){
           const [tabla, sep] = prob(p, i);
           bloques.push(tabla, sep);
         });
-        hojas.push(hoja(cab(m), [...pwTitulo(`Problemas · ${lbl}`, 'Resolución de problemas'), ...pwDatosAlumno(),
+        hojas.push(hoja(cab(m), [...pwTitulo(`Problemas · ${lbl} de 2`, k === 'p1' ? 'Problemas de un paso (una operación)' : 'Problemas de dos pasos (dos operaciones)'), ...pwDatosAlumno(),
           P(base === '1º' ? 'Escucha el problema. Dibuja, haz la operación y escribe la solución.' : 'Lee despacio cada problema. Escribe los datos, la operación y la solución con una frase.', { sz: peque ? 13 : 11, c: '#444444', after: 140 }),
           ...bloques]));
       });
@@ -427,7 +434,14 @@ async function generarProblemasWord(cursoId, keys, tipo){
     // ── maestro/a ──
     hojas.push(hoja(cab(m), [
       H(`Guía del maestro/a · Resolución de problemas · ${base} · ${m.corto}`, COL, 13, { before: 0 }),
-      P(`**Qué mide:** ${pr.contenidos} La Parte 1 tiene problemas de un paso y la Parte 2, de dos pasos o con más razonamiento.`, { sz: 10.5, c: '#555555' }),
+      P(`**Qué mide:** ${pr.contenidos}`, { sz: 10.5, c: '#555555' }),
+      H('¿Qué son la Parte 1 y la Parte 2?', COL, 12),
+      P('La prueba de problemas tiene **dos partes**, en dos hojas distintas del cuadernillo del alumnado, con 3 problemas cada una. Se pasan en **dos sesiones** (un día cada parte) y **cada parte da una nota** en la app:', { sz: 11 }),
+      T([['Parte', 'Qué hace el alumno/a', 'Nota en la app'],
+         ['**Parte 1 · Un paso**', '3 problemas que se resuelven con una sola operación.', 'Nota 1 de Problemas'],
+         ['**Parte 2 · Dos pasos**', '3 problemas que necesitan dos operaciones seguidas o pensar un poco más.', 'Nota 2 de Problemas']],
+        { anchos: [2600, 4964, 2300], cabecera: '#FDECEC', celda: { sz: 10.5 } }),
+      P('Así se ve si el alumno/a resuelve problemas sencillos y también si es capaz de encadenar dos pasos.', { sz: 10.5, c: '#555555', before: 80 }),
       H('1 · Cómo se aplica', COL, 12),
       ...lista([
         `Colectiva, en el aula, en **dos sesiones** (un día cada parte). Unos ${peque ? '25' : '30'} minutos por parte.`,
