@@ -542,6 +542,33 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
   </div>
 </div>
 
+<!-- MODAL SUBIR NOTAS -->
+<div class="mov" id="sn-modal" style="display:none">
+  <div class="mbox" style="max-width:480px">
+    <h3>Subir notas desde la hoja de registro</h3>
+    <p style="display:block;font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:12px">
+      Sube la <b>hoja de registro</b> del cuadernillo del maestro/a (lectura, cálculo o problemas) con las notas puestas.
+      La app reconoce las siglas y pone las notas de <b>Nota VL, CL, EO</b> o <b>Nota 1 y Nota 2</b> en <b id="sn-curso"></b>.
+      Funciona con el Word (.docx) o con un PDF guardado desde Word; no con fotos ni escaneos a mano.
+    </p>
+    <label class="implbl">Archivo (.docx o .pdf)</label>
+    <input type="file" id="sn-file" accept=".docx,.pdf" class="impfile"/>
+    <div style="margin-top:12px">
+      <label class="implbl">Trimestre</label>
+      <select class="minisel" id="sn-trim" style="width:100%;border-radius:12px;padding:9px 12px">
+        <option value="auto">Detectarlo del documento</option>
+        <option value="0">1er Trimestre</option><option value="1">2º Trimestre</option><option value="2">3er Trimestre</option>
+      </select>
+    </div>
+    <label class="impradio" style="margin-top:10px"><input type="checkbox" id="sn-sust" checked/> Sustituir las notas que ya estén puestas</label>
+    <div id="sn-prev" style="margin-top:12px;max-height:230px;overflow:auto"></div>
+    <div class="mact">
+      <button class="btnp" id="sn-ok" disabled>Guardar notas</button>
+      <button class="btns" id="sn-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div class="mov" id="modal" style="display:none">
   <div class="mbox glass">
@@ -555,7 +582,7 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
   </div>
 </div>
 
-<script src="pruebas-word.js?v=20261022"></script>
+<script src="pruebas-word.js?v=20261022c"></script>
 <script>
 // ══════════════════════════════════════════════════════════════
 // CONSTANTES
@@ -743,6 +770,7 @@ function viewNotas(){
     ${rows}
     <div style="margin-top:13px;display:flex;gap:7px;flex-wrap:wrap">
       <button class="btnp" id="btn-addal">＋ Alumno</button>
+      <button class="btns" id="btn-subirnotas">📄 Subir notas (Word/PDF)</button>
       ${esDireccion()?'<button class="btns" id="btn-import">⬆ Importar de Séneca</button>':''}
       <button class="btnd" id="btn-vaciarcl">🗑 Vaciar clase</button>
     </div>
@@ -1008,6 +1036,7 @@ function bind(){
   document.querySelectorAll('[data-renom]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();renomId=parseInt(b.dataset.renom);openModal('renombrar');}));
   document.getElementById('btn-import')?.addEventListener('click',abrirImport);
   document.getElementById('btn-vaciarcl')?.addEventListener('click',()=>openModal('vaciar'));
+  document.getElementById('btn-subirnotas')?.addEventListener('click',abrirSubirNotas);
   document.getElementById('btn-borral')?.addEventListener('click',()=>{renomId=S.ae;openModal('borrar');});
   document.querySelectorAll('[data-borrar]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();renomId=parseInt(b.dataset.borrar);openModal('borrar');}));
   document.querySelectorAll('.at[data-alid]').forEach(btn=>{
@@ -2390,15 +2419,263 @@ document.getElementById('imp-curso').addEventListener('change',e=>{
 });
 document.getElementById('btn-salir-demo').addEventListener('click',()=>location.reload());
 iniciarAcceso();
+// ══════════════════════════════════════════════════════════════
+// SUBIR NOTAS DESDE LA HOJA DE REGISTRO (Word o PDF)
+// ══════════════════════════════════════════════════════════════
+let NOTAS_DOC=null;   // {entradas:[{sig,ti,cat,vals}], cursoDoc, origen}
+function cargarScript(src){
+  return new Promise((ok,ko)=>{
+    if(document.querySelector(`script[src="${src}"]`)) return ok();
+    const s=document.createElement('script');s.src=src;s.onload=()=>ok();s.onerror=()=>ko(new Error('no se pudo cargar '+src));
+    document.head.appendChild(s);
+  });
+}
+const nrmTxt=t=>(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ').trim();
+const claveSig=t=>{const s=sigla((t||'').trim());return s.replace(/[\s.]/g,'').toUpperCase();};
+function trimDeTexto(t){
+  t=nrmTxt(t);
+  if(/(1\s*\.?\s*(er|o|º)?\s*trim|primer trim)/.test(t))return 0;
+  if(/(2\s*\.?\s*(º|o)?\s*trim|segundo trim)/.test(t))return 1;
+  if(/(3\s*\.?\s*(er|o|º)?\s*trim|tercer trim)/.test(t))return 2;
+  return null;
+}
+function numNota(v){
+  v=(v||'').toString().trim().replace(',','.');
+  if(!/^\d{1,2}(\.\d{1,2})?$/.test(v))return null;
+  const n=parseFloat(v);return(n>=0&&n<=10)?n:null;
+}
+
+// ── Lectores: devuelven una secuencia de {t:'p',text} y {t:'tbl',rows:[[celdas]]}
+async function leerDocx(buf){
+  await cargarScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+  const zip=await JSZip.loadAsync(buf);
+  const xml=await zip.file('word/document.xml')?.async('string');
+  if(!xml)throw new Error('no es un Word (.docx) válido');
+  const doc=new DOMParser().parseFromString(xml,'application/xml');
+  const W='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+  const txt=el=>[...el.getElementsByTagNameNS(W,'t')].map(x=>x.textContent).join('');
+  const body=doc.getElementsByTagNameNS(W,'body')[0];
+  const out=[];
+  [...body.children].forEach(el=>{
+    if(el.localName==='p')out.push({t:'p',text:txt(el)});
+    else if(el.localName==='tbl'){
+      const rows=[...el.children].filter(r=>r.localName==='tr')
+        .map(r=>[...r.children].filter(c=>c.localName==='tc').map(c=>txt(c).trim()));
+      out.push({t:'tbl',rows});
+    }
+  });
+  return out;
+}
+async function leerPdf(buf){
+  await cargarScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const out=[];let hayTexto=false;
+  for(let p=1;p<=pdf.numPages;p++){
+    const tc=await (await pdf.getPage(p)).getTextContent();
+    const items=tc.items.filter(i=>i.str&&i.str.trim()).map(i=>({s:i.str,x:i.transform[4],y:i.transform[5],w:i.width||0}));
+    if(items.length)hayTexto=true;
+    // agrupar por líneas
+    items.sort((a,b)=>b.y-a.y||a.x-b.x);
+    const lineas=[];
+    items.forEach(it=>{
+      const l=lineas.find(l=>Math.abs(l.y-it.y)<3);
+      if(l)l.items.push(it);else lineas.push({y:it.y,items:[it]});
+    });
+    // fusionar trozos cercanos en celdas
+    const celdasDe=l=>{
+      const its=l.items.sort((a,b)=>a.x-b.x);const cs=[];
+      its.forEach(it=>{
+        const u=cs[cs.length-1];
+        if(u&&it.x-(u.x2)<6){u.s+=(it.x-u.x2>1?' ':'')+it.s;u.x2=it.x+it.w;}
+        else cs.push({s:it.s,x:it.x,x2:it.x+it.w});
+      });
+      return cs.map(c=>({s:c.s.trim(),xc:(c.x+c.x2)/2,x:c.x}));
+    };
+    let cab=null,rows=null;
+    const cerrar=()=>{cab=null;rows=null;};
+    const pareceSigla=t=>/^[A-ZÁÉÍÓÚÑÜ](\.?\s?[A-ZÁÉÍÓÚÑÜ]){0,2}\.?(\s?\d+)?$/.test((t||'').trim());
+    lineas.forEach(l=>{
+      const cs=celdasDe(l);
+      const txt=cs.map(c=>c.s).join(' ');
+      if(/^alumno/i.test(nrmTxt(cs[0].s))&&cs.length>1){
+        cerrar();cab=cs;rows=[cs.map(c=>c.s)];out.push({t:'tbl',rows});return;
+      }
+      if(cab&&rows.length===1&&!pareceSigla(cs[0].s)){   // cabecera partida en dos líneas
+        cs.forEach(c=>{
+          let best=1,d=1e9;
+          cab.forEach((h,i)=>{if(i&&Math.abs(h.xc-c.xc)<d){d=Math.abs(h.xc-c.xc);best=i;}});
+          rows[0][best]+=' '+c.s;
+        });
+        return;
+      }
+      if(cab&&pareceSigla(cs[0].s)&&cs[0].x<cab[1].x-4){
+        const fila=cab.map(()=>'');fila[0]=cs[0].s;
+        cs.slice(1).forEach(c=>{
+          let best=1,d=1e9;
+          cab.forEach((h,i)=>{if(i&&Math.abs(h.xc-c.xc)<d){d=Math.abs(h.xc-c.xc);best=i;}});
+          fila[best]=(fila[best]?fila[best]+' ':'')+c.s;
+        });
+        rows.push(fila);return;
+      }
+      if(cab&&rows.length>1&&!/^\s*$/.test(txt)&&!numNota(cs[0].s))cerrar();
+      out.push({t:'p',text:txt});
+    });
+    cerrar();
+  }
+  if(!hayTexto)throw new Error('el PDF no tiene texto (parece una foto o un escaneo). Rellena la tabla en el Word y súbelo, o guarda el Word como PDF');
+  return out;
+}
+
+// ── Interpretar las tablas de registro
+function interpretarRegistro(seq){
+  const entradas=[];let titulo='',cursoDoc=null,tiDoc=null;
+  seq.forEach(b=>{
+    if(b.t==='p'){
+      const tt=trimDeTexto(b.text);if(tt!==null)tiDoc=tt;
+      if(/registro|prueba|calculo|problema|lectura/.test(nrmTxt(b.text)))titulo=b.text;
+      const m=b.text.match(/Hoja de registro del grupo\s*·\s*([^·]+)·/i);
+      if(m)cursoDoc=m[1].trim();
+      return;
+    }
+    const rows=b.rows;if(!rows.length)return;
+    const cab=rows[0].map(nrmTxt);
+    const iAl=cab.findIndex(h=>h.startsWith('alumno'));
+    if(iAl<0)return;
+    const todo=cab.join(' ');
+    let tipoMulti=null;
+    if(/aciertos/.test(todo)||/calculo/.test(nrmTxt(titulo)))tipoMulti='calc';
+    if(/\/\s*12/.test(todo)||/problema/.test(nrmTxt(titulo)))tipoMulti='rp';
+    const cols=[];
+    cab.forEach((h,i)=>{
+      if(/nota\s*vl/.test(h))cols.push({i,cat:'vl'});
+      else if(/nota\s*cl/.test(h))cols.push({i,cat:'cl'});
+      else if(/nota\s*eo/.test(h))cols.push({i,cat:'eo'});
+      else if(/nota\s*1/.test(h)&&tipoMulti)cols.push({i,cat:tipoMulti,pos:0});
+      else if(/nota\s*2/.test(h)&&tipoMulti)cols.push({i,cat:tipoMulti,pos:1});
+    });
+    if(!cols.length)return;
+    const ti=tiDoc;
+    rows.slice(1).forEach(r=>{
+      const sig=(r[iAl]||'').trim();if(!sig)return;
+      const porCat={};
+      cols.forEach(c=>{
+        const n=numNota(r[c.i]);if(n===null)return;
+        if(c.pos===undefined)porCat[c.cat]=n;
+        else{porCat[c.cat]=porCat[c.cat]||[];porCat[c.cat][c.pos]=n;}
+      });
+      Object.entries(porCat).forEach(([cat,vals])=>entradas.push({sig,ti,cat,vals}));
+    });
+  });
+  return{entradas,cursoDoc};
+}
+
+function abrirSubirNotas(){
+  NOTAS_DOC=null;
+  document.getElementById('sn-file').value='';
+  document.getElementById('sn-prev').innerHTML='';
+  document.getElementById('sn-ok').disabled=true;
+  document.getElementById('sn-trim').value='auto';
+  document.getElementById('sn-curso').textContent=S.ca;
+  document.getElementById('sn-modal').style.display='flex';
+}
+function cerrarSubirNotas(){document.getElementById('sn-modal').style.display='none';}
+
+function previaSubirNotas(){
+  const prev=document.getElementById('sn-prev');
+  if(!NOTAS_DOC){prev.innerHTML='';return;}
+  const selT=document.getElementById('sn-trim').value;
+  const mapa={};alumnos().forEach(a=>mapa[claveSig(a.nombre)]=a);
+  const catLbl=Object.fromEntries(CATS.map(c=>[c.key,c.short]));
+  const grupos={};const noEnc=new Set();let n=0;
+  NOTAS_DOC.entradas.forEach(e=>{
+    const ti=selT==='auto'?(e.ti??S.ta):parseInt(selT);
+    const al=mapa[claveSig(e.sig)];
+    if(!al){noEnc.add(e.sig);return;}
+    const k=ti;grupos[k]=grupos[k]||{};
+    grupos[k][al.id]=grupos[k][al.id]||{al,c:{}};
+    grupos[k][al.id].c[e.cat]=e.vals;n++;
+  });
+  if(!n){
+    prev.innerHTML=`<p class="gp" style="color:#dc2626">⚠ No he encontrado notas de alumnado de ${S.ca} en el documento. Comprueba que es la <b>hoja de registro</b> del cuadernillo del maestro/a, con las columnas de nota rellenas, y que las siglas coinciden.</p>`;
+    document.getElementById('sn-ok').disabled=true;return;
+  }
+  const fv=v=>Array.isArray(v)?v.filter(x=>x!==undefined).map(fmt).join(' · '):fmt(v);
+  let h='';
+  if(NOTAS_DOC.cursoDoc&&nrmTxt(NOTAS_DOC.cursoDoc)!==nrmTxt(S.ca))
+    h+=`<p class="gp" style="color:#b45309">⚠ El documento es de <b>${NOTAS_DOC.cursoDoc}</b> y estás en <b>${S.ca}</b>. Revisa que sea el curso correcto.</p>`;
+  Object.keys(grupos).sort().forEach(ti=>{
+    const lista=Object.values(grupos[ti]).sort((a,b)=>claveOrden(a.al.nombre).localeCompare(claveOrden(b.al.nombre),'es'));
+    h+=`<div style="font-weight:800;font-size:12px;margin:6px 0 4px">${TRIMS[ti]} · ${lista.length} alumnos</div>`
+      +lista.map(x=>`<div style="font-size:12px;padding:3px 0;border-bottom:1px solid rgba(200,215,240,.5)"><b>${sigla(x.al.nombre)}</b> — `
+      +Object.entries(x.c).map(([k,v])=>`${catLbl[k]}: ${fv(v)}`).join(' · ')+`</div>`).join('');
+  });
+  if(noEnc.size)h+=`<p class="gp" style="color:#b45309;margin-top:8px">⚠ Siglas que no están en ${S.ca} (no se importan): ${[...noEnc].join(', ')}</p>`;
+  prev.innerHTML=h;
+  document.getElementById('sn-ok').disabled=false;
+}
+
+async function leerArchivoNotas(file){
+  const prev=document.getElementById('sn-prev');
+  NOTAS_DOC=null;document.getElementById('sn-ok').disabled=true;
+  if(!file)return;
+  prev.innerHTML='<p class="gp">Leyendo el documento…</p>';
+  try{
+    const buf=await file.arrayBuffer();
+    const nom=file.name.toLowerCase();
+    let seq;
+    if(nom.endsWith('.pdf'))seq=await leerPdf(buf);
+    else if(nom.endsWith('.docx'))seq=await leerDocx(buf);
+    else throw new Error('sube un Word (.docx) o un PDF. Si es un .doc antiguo, ábrelo en Word y guárdalo como .docx');
+    NOTAS_DOC=interpretarRegistro(seq);
+    previaSubirNotas();
+  }catch(err){
+    prev.innerHTML='<p class="gp" style="color:#dc2626">⚠ No he podido leer el archivo: '+err.message+'.</p>';
+  }
+}
+
+function aplicarSubirNotas(){
+  if(!NOTAS_DOC)return;
+  const c=curso();if(!c)return;
+  const selT=document.getElementById('sn-trim').value;
+  const sustituir=document.getElementById('sn-sust').checked;
+  const mapa={};alumnos().forEach(a=>mapa[claveSig(a.nombre)]=a);
+  let n=0;const tocados=new Set();
+  NOTAS_DOC.entradas.forEach(e=>{
+    const al=mapa[claveSig(e.sig)];if(!al)return;
+    const ti=selT==='auto'?(e.ti??S.ta):parseInt(selT);
+    c.notas[al.id]=c.notas[al.id]||{};
+    const nt=c.notas[al.id][ti]=c.notas[al.id][ti]||defN();
+    if(Array.isArray(e.vals)){
+      const prevArr=(nt[e.cat]||[]).filter(x=>x!=='');
+      if(!sustituir&&prevArr.length)return;
+      nt[e.cat]=e.vals.filter(x=>x!==undefined).map(String);
+    }else{
+      if(!sustituir&&nt[e.cat]!==''&&nt[e.cat]!==undefined)return;
+      nt[e.cat]=String(e.vals);
+    }
+    n++;tocados.add(al.id);
+  });
+  window._db?.scheduleSave(S.ca);
+  cerrarSubirNotas();render();
+  setTimeout(()=>alert(`✅ Notas importadas: ${n} notas de ${tocados.size} alumnos/as en ${S.ca}.`),50);
+}
+document.getElementById('sn-file').addEventListener('change',e=>leerArchivoNotas(e.target.files[0]));
+document.getElementById('sn-trim').addEventListener('change',previaSubirNotas);
+document.getElementById('sn-ok').addEventListener('click',aplicarSubirNotas);
+document.getElementById('sn-cancel').addEventListener('click',cerrarSubirNotas);
+document.getElementById('sn-modal').addEventListener('click',e=>{if(e.target.id==='sn-modal')cerrarSubirNotas();});
+
 // ── Aviso de novedades (sale una sola vez en cada dispositivo) ──
 (function(){
-  const ID='2026-10-22b';
+  const ID='2026-10-22c';
   try{ if(localStorage.getItem('capi_lyp_novedades')===ID) return; }catch(e){}
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px';
   d.innerHTML=`<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:Nunito,sans-serif;color:#1a2340">
     <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades</div>
     <ul style="font-size:13.5px;line-height:1.55;margin:0 0 14px;padding-left:18px">
+      <li>Nuevo botón <b>📄 Subir notas (Word/PDF)</b> en Notas: sube la hoja de registro rellena y la app pone las notas sola.</li>
       <li>La lista de alumnado se ordena por el <b>primer apellido</b> (2.ª letra de las siglas), como en Séneca.</li>
       <li>Nuevo botón <b>🗑 Borrar alumno</b> en cada fila y en su ficha, por si alguien se da de baja.</li>
       <li>Cálculo y Problemas tienen <b>Parte 1 y Parte 2</b>: dos hojas que se pasan en dos sesiones y dan la <b>Nota 1</b> y la <b>Nota 2</b> en la app. Lo explica la guía del maestro/a.</li>

@@ -144,7 +144,7 @@ function pwDatosAlumno(){
 function pwTitulo(t, sub){ return [P(t, { b: true, sz: 17, al: 'c', after: 0 }), P(sub, { sz: 10.5, c: '#777777', al: 'c', after: 80 })]; }
 function pwRegistro(cursoId, m, col, cabTxt, cols, extra){
   const c = S.cursos[cursoId];
-  const als = (c && c.alumnos) ? c.alumnos : [];
+  const als = (c && c.alumnos) ? (typeof ordenarAlumnos === "function" ? ordenarAlumnos(c.alumnos) : c.alumnos) : [];
   const nombres = siglasUnicas(als.map(a => a.nombre));
   const lst = nombres.length ? nombres : new Array(14).fill('');
   const wNom = 2200, wc = Math.floor((PW_W - wNom) / cols.length);
