@@ -247,6 +247,10 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
 .av4{background:rgba(239,68,68,0.14);color:#dc2626}.av5{background:rgba(34,197,94,0.14);color:#16a34a}
 .btn-renom-row{flex-shrink:0;width:32px;height:32px;border-radius:9px;border:1.5px solid rgba(200,215,240,0.7);background:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .btn-renom-row:hover{background:white;border-color:var(--accent)}
+.btn-subirnotas{flex-shrink:0;margin-left:8px;padding:7px 13px;border:none;border-radius:999px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;color:#fff;
+  background:linear-gradient(135deg,#f97316,#ec4899);box-shadow:0 4px 14px rgba(236,72,153,.35);transition:transform .15s,box-shadow .15s}
+.btn-subirnotas:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(236,72,153,.45)}
 .btn-del-row:hover{border-color:#dc2626;background:rgba(239,68,68,0.1)}
 .aname{flex:1;font-size:13px;font-weight:600;color:var(--text)}
 .pills{display:flex;gap:4px;flex-wrap:wrap}
@@ -764,13 +768,13 @@ function viewNotas(){
     </div>`;
   }).join(''):`<p style="color:var(--text3);text-align:center;padding:36px 0;font-size:13px">Sin alumnos. Añade el primero ↓</p>`;
   return`<div class="card glass">
-    <div class="ct">📋 ${S.ca} · ${TRIMS[S.ta]}
+    <div class="ct" style="flex-wrap:wrap;row-gap:8px">📋 ${S.ca} · ${TRIMS[S.ta]}
       <span style="margin-left:auto;font-size:11px;color:var(--text3);font-weight:600">${als.length} alumnos</span>
+      <button class="btn-subirnotas" id="btn-subirnotas">📄 Subir notas (Word/PDF)</button>
     </div>
     ${rows}
     <div style="margin-top:13px;display:flex;gap:7px;flex-wrap:wrap">
       <button class="btnp" id="btn-addal">＋ Alumno</button>
-      <button class="btns" id="btn-subirnotas">📄 Subir notas (Word/PDF)</button>
       ${esDireccion()?'<button class="btns" id="btn-import">⬆ Importar de Séneca</button>':''}
       <button class="btnd" id="btn-vaciarcl">🗑 Vaciar clase</button>
     </div>
