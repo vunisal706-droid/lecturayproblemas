@@ -247,6 +247,7 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
 .av4{background:rgba(239,68,68,0.14);color:#dc2626}.av5{background:rgba(34,197,94,0.14);color:#16a34a}
 .btn-renom-row{flex-shrink:0;width:32px;height:32px;border-radius:9px;border:1.5px solid rgba(200,215,240,0.7);background:rgba(255,255,255,0.6);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .btn-renom-row:hover{background:white;border-color:var(--accent)}
+.btn-del-row:hover{border-color:#dc2626;background:rgba(239,68,68,0.1)}
 .aname{flex:1;font-size:13px;font-weight:600;color:var(--text)}
 .pills{display:flex;gap:4px;flex-wrap:wrap}
 .pill{padding:2px 7px;border-radius:7px;font-size:10px;font-weight:800;font-family:'Nunito',sans-serif}
@@ -598,7 +599,15 @@ Object.entries(INIT).forEach(([k,lista])=>{
 
 // ── helpers ───────────────────────────────────────────────────
 function curso(){return S.cursos[S.ca]}
-function alumnos(){return curso()?.alumnos||[]}
+// Orden de lista: 1er apellido, 2º apellido y luego nombre (siglas N.A.A.)
+function claveOrden(nombre){
+  const sg=sigla(nombre);
+  const num=(sg.match(/\d+/)||['0'])[0].padStart(3,'0');
+  const l=sg.replace(/[^A-ZÁÉÍÓÚÑÜ]/g,'');
+  return (l.slice(1,2)||'~')+(l.slice(2,3)||' ')+(l.slice(0,1)||' ')+num;
+}
+function ordenarAlumnos(arr){return [...arr].sort((a,b)=>claveOrden(a.nombre).localeCompare(claveOrden(b.nombre),'es'))}
+function alumnos(){return ordenarAlumnos(curso()?.alumnos||[])}
 function getN(aid,ti){return curso()?.notas[aid]?.[ti]||defN()}
 function setN(aid,ti,fn){
   const c=curso();if(!c)return;
@@ -724,6 +733,7 @@ function viewNotas(){
       <span class="aname">${sg}</span>
       <div class="pills">${pills}</div>
       <button class="btn-renom-row" data-renom="${al.id}" title="Editar siglas" aria-label="Editar siglas de ${sg}">✏️</button>
+      <button class="btn-renom-row btn-del-row" data-borrar="${al.id}" title="Borrar alumno" aria-label="Borrar a ${sg}">🗑</button>
     </div>`;
   }).join(''):`<p style="color:var(--text3);text-align:center;padding:36px 0;font-size:13px">Sin alumnos. Añade el primero ↓</p>`;
   return`<div class="card glass">
@@ -773,6 +783,7 @@ function editorAlumno(){
         <div style="font-size:11px;color:var(--text3)">${S.ca} · alumno ${idx+1} de ${als.length}</div>
       </div>
       <button class="btns" id="btn-renom" title="Editar siglas" aria-label="Editar siglas" style="flex-shrink:0">✏️ Siglas</button>
+      <button class="btnd" id="btn-borral" title="Borrar alumno" aria-label="Borrar alumno" style="flex-shrink:0;padding:9px 12px">🗑</button>
       <div class="nav-al">
         <button class="bna" id="btn-prev" ${idx<=0?'disabled':''}>‹</button>
         <span class="napos">${idx+1}/${als.length}</span>
@@ -997,6 +1008,8 @@ function bind(){
   document.querySelectorAll('[data-renom]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();renomId=parseInt(b.dataset.renom);openModal('renombrar');}));
   document.getElementById('btn-import')?.addEventListener('click',abrirImport);
   document.getElementById('btn-vaciarcl')?.addEventListener('click',()=>openModal('vaciar'));
+  document.getElementById('btn-borral')?.addEventListener('click',()=>{renomId=S.ae;openModal('borrar');});
+  document.querySelectorAll('[data-borrar]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();renomId=parseInt(b.dataset.borrar);openModal('borrar');}));
   document.querySelectorAll('.at[data-alid]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const id=parseInt(btn.dataset.alid);
@@ -1023,6 +1036,12 @@ function openModal(mode){
     p.style.display='block';inp.style.display='none';ok.textContent='Sí, vaciar';
   }
   inp.value='';
+  if(mode==='borrar'){
+    const al=alumnos().find(a=>a.id===renomId);
+    t.textContent='Borrar alumno';
+    p.textContent=`Se borrará a ${al?sigla(al.nombre):'este alumno'} de ${S.ca} con todas sus notas. Esta acción no se puede deshacer.`;
+    p.style.display='block';inp.style.display='none';ok.textContent='Sí, borrar';
+  }
   if(mode==='renombrar'){
     const al=alumnos().find(a=>a.id===renomId);
     t.textContent='Editar siglas';inp.placeholder='Ej: G.L.M.';ok.textContent='Guardar';
@@ -1030,7 +1049,7 @@ function openModal(mode){
     inp.value=al?sigla(al.nombre):'';
   }
   document.getElementById('modal').style.display='flex';
-  if(mode!=='vaciar')setTimeout(()=>inp.focus(),60);
+  if(mode!=='vaciar'&&mode!=='borrar')setTimeout(()=>inp.focus(),60);
 }
 function closeModal(){document.getElementById('modal').style.display='none';}
 function confirmModal(){
@@ -1048,6 +1067,15 @@ function confirmModal(){
     const nuevo=normSigla(val);if(!nuevo)return;
     const c=curso();const al=c&&c.alumnos.find(a=>a.id===renomId);
     if(al){al.nombre=nuevo;window._db?.scheduleSave(S.ca);}
+  }else if(mmode==='borrar'){
+    const c=curso();
+    if(c){
+      c.alumnos=c.alumnos.filter(a=>a.id!==renomId);
+      delete c.notas[renomId];
+      delete S.agraf[renomId];
+      if(S.ae===renomId)S.ae=null;
+      window._db?.scheduleSave(S.ca);
+    }
   }else if(mmode==='vaciar'){
     const c=curso();if(c){c.alumnos=[];c.notas={};S.ae=null;window._db?.scheduleSave(S.ca);}
   }
@@ -2300,7 +2328,7 @@ function aplicarImport(){
       const ya=new Set(S.cursos[cid].alumnos.map(a=>a.nombre));
       sig.forEach(s=>{ if(!ya.has(s)) S.cursos[cid].alumnos.push({id:uid(),nombre:s}); });
     }
-    S.cursos[cid].alumnos.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+    S.cursos[cid].alumnos=ordenarAlumnos(S.cursos[cid].alumnos);
     tocados.push(cid);
   });
 
@@ -2364,13 +2392,15 @@ document.getElementById('btn-salir-demo').addEventListener('click',()=>location.
 iniciarAcceso();
 // ── Aviso de novedades (sale una sola vez en cada dispositivo) ──
 (function(){
-  const ID='2026-10-22';
+  const ID='2026-10-22b';
   try{ if(localStorage.getItem('capi_lyp_novedades')===ID) return; }catch(e){}
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px';
   d.innerHTML=`<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:Nunito,sans-serif;color:#1a2340">
-    <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades en Pruebas</div>
+    <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades</div>
     <ul style="font-size:13.5px;line-height:1.55;margin:0 0 14px;padding-left:18px">
+      <li>La lista de alumnado se ordena por el <b>primer apellido</b> (2.ª letra de las siglas), como en Séneca.</li>
+      <li>Nuevo botón <b>🗑 Borrar alumno</b> en cada fila y en su ficha, por si alguien se da de baja.</li>
       <li>Cálculo y Problemas tienen <b>Parte 1 y Parte 2</b>: dos hojas que se pasan en dos sesiones y dan la <b>Nota 1</b> y la <b>Nota 2</b> en la app. Lo explica la guía del maestro/a.</li>
       <li>Cada prueba se descarga en <b>dos documentos</b>: <b>cuadernillo del alumnado</b> (para fotocopiar) y <b>cuadernillo del maestro/a</b> (guía, soluciones y registro).</li>
       <li>Puedes descargar <b>un trimestre</b> o <b>los tres juntos</b>.</li>
