@@ -913,7 +913,7 @@ function buildGrafCharts(){
 
 // ── VIEW RESUMEN ──────────────────────────────────────────────
 function viewResumen(){
-  const cids=Object.keys(S.cursos);
+  const cids=cursosReales();
   const catCharts=CATS.map(cat=>`<div class="card glass">
     <div class="ct"><span style="width:9px;height:9px;border-radius:50%;background:${cat.color};display:inline-block"></span>${cat.label}</div>
     <div class="chart-wrap"><canvas id="res-${cat.key}"></canvas></div>
@@ -932,7 +932,7 @@ function viewResumen(){
 }
 
 function buildResCharts(){
-  const cids=Object.keys(S.cursos);
+  const cids=cursosReales();
   const colors=['#4f7ef8','#8b5cf6','#14b8a6','#f59e0b','#ef4444','#22c55e'];
   cids.forEach((cid,ci)=>{
     const key=cid.replace('º','g');
@@ -1997,8 +1997,10 @@ function mediaCursoGlobal(cid,ti,catKey){
   const vs=c.alumnos.map(a=>mediaAlumno(cid,a.id,ti,catKey)).filter(v=>v!==null);
   return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null;
 }
+// El curso «Demo» (de pruebas) no cuenta en las estadísticas del centro
+function cursosReales(){return Object.keys(S.cursos).filter(c=>window._demo||!/^demo/i.test(c.trim()));}
 function mediaCentro(ti,catKey){
-  const vs=Object.keys(S.cursos).map(cid=>mediaCursoGlobal(cid,ti,catKey)).filter(v=>v!==null);
+  const vs=cursosReales().map(cid=>mediaCursoGlobal(cid,ti,catKey)).filter(v=>v!==null);
   return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null;
 }
 function delta(a,b){ if(a===null||b===null)return null; return b-a; }
@@ -2028,7 +2030,7 @@ function viewEvolucion(){
     `<div class="kpi kpid"><div class="kl">Progreso 1T → 3T</div><div class="kv">${flecha(dCentro)}</div></div>`;
 
   // ── cursos ──
-  const cids=Object.keys(S.cursos);
+  const cids=cursosReales();
   const filasCurso=cids.map(cid=>{
     const v=TS.map((_,ti)=>mediaCursoGlobal(cid,ti,cat));
     const d=delta(v[0],v[2]);
@@ -2059,7 +2061,7 @@ function viewEvolucion(){
         <span style="margin-left:auto">${selCat}</span></div>
       <p style="font-size:11.5px;color:var(--text3);margin:0 0 12px">${catLbl} · curso escolar ${anioLabel(S.anio)}</p>
       <div class="kgrid">${kpis}</div>
-      <div class="chart-wrap" style="margin-top:14px"><canvas id="evo-centro"></canvas></div>
+      ${mc.every(v=>v===null)?`<p style="text-align:center;color:var(--text3);padding:30px 0;font-size:13px">Todavía no hay notas este curso escolar. La gráfica aparecerá cuando se apunten las del 1er trimestre.</p>`:`<div class="chart-wrap" style="margin-top:14px"><canvas id="evo-centro"></canvas></div>`}
     </div>
 
     <div class="card glass">
@@ -2095,7 +2097,7 @@ function buildEvolCharts(){
       tension:0.35, fill:true, spanGaps:true,
     }]},options:gOpts}));
 
-  const cids=Object.keys(S.cursos);
+  const cids=cursosReales();
   const e2=document.getElementById('evo-cursos');
   if(e2) charts.push(new Chart(e2,{type:'line',data:{labels:TRIMS,datasets:cids.map((cid,i)=>({
       label:cid, data:TS.map((_,ti)=>mediaCursoGlobal(cid,ti,cat)),
@@ -2672,13 +2674,14 @@ document.getElementById('sn-modal').addEventListener('click',e=>{if(e.target.id=
 
 // ── Aviso de novedades (sale una sola vez en cada dispositivo) ──
 (function(){
-  const ID='2026-10-22c';
+  const ID='2026-10-22d';
   try{ if(localStorage.getItem('capi_lyp_novedades')===ID) return; }catch(e){}
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px';
   d.innerHTML=`<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:Nunito,sans-serif;color:#1a2340">
     <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades</div>
     <ul style="font-size:13.5px;line-height:1.55;margin:0 0 14px;padding-left:18px">
+      <li>En <b>Evolución</b> y <b>Resumen</b> el curso «Demo» ya no cuenta en las medias del centro, y si no hay notas no sale gráfica.</li>
       <li>Nuevo botón <b>📄 Subir notas (Word/PDF)</b> en Notas: sube la hoja de registro rellena y la app pone las notas sola.</li>
       <li>La lista de alumnado se ordena por el <b>primer apellido</b> (2.ª letra de las siglas), como en Séneca.</li>
       <li>Nuevo botón <b>🗑 Borrar alumno</b> en cada fila y en su ficha, por si alguien se da de baja.</li>
