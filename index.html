@@ -428,6 +428,25 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
 
 /* ── Panel de gráficas ── */
 .gx{display:flex;flex-direction:column;gap:14px}
+.inf-ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.inf-btns{display:flex;flex-wrap:wrap;gap:8px}
+.inf-aviso{background:#eef6ff;border:1px solid #cfe0fb;border-radius:12px;padding:9px 12px;font-size:12px;color:#2a4a7d;line-height:1.5;margin-bottom:10px}
+.inf-ta{width:100%;height:190px;margin-top:10px;border:1px solid var(--linea,#d8e1f2);border-radius:12px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.45;color:#3a4a6b;background:#fbfcff;resize:vertical}
+.inf-hoja{background:rgba(255,255,255,.88)}
+.inf-doc{font-size:13px;line-height:1.6;color:var(--text,#1a2340)}
+.inf-doc h3{font-size:19px;text-align:center;margin:4px 0 0}
+.inf-doc h4{font-size:14px;color:#2f6fed;margin:20px 0 6px}
+.inf-doc p{margin:0 0 9px}
+.inf-sub{text-align:center;color:var(--text3,#8898bb);font-size:12px;margin:4px 0 16px!important}
+.inf-sg{font-weight:600;color:var(--text3,#8898bb);font-size:12px}
+.inf-t{width:100%;border-collapse:collapse;font-size:12px;margin:4px 0 10px;background:#fff;border-radius:10px;overflow:hidden}
+.inf-t th,.inf-t td{border:1px solid #dde5f5;padding:5px 8px;text-align:left}
+.inf-t th{background:#eef3ff;font-weight:800;font-size:11.5px;color:#3a4a6b}
+.inf-t .inf-n{text-align:center}
+.inf-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.inf-ol{margin:0;padding-left:20px}.inf-ol li{margin-bottom:8px}
+.inf-pie{color:var(--text3,#8898bb);font-size:11px;margin-top:18px!important}
+@media(max-width:640px){.inf-t{font-size:11px}.inf-t th,.inf-t td{padding:4px 5px}}
 .gx .ct{font-size:15px}
 .gx-cts{font-size:11.5px;font-weight:700;color:var(--text3)}
 .gx-p{font-size:12px;color:var(--text3);margin:-4px 0 10px;line-height:1.45}
@@ -578,6 +597,7 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
     <button class="nb" data-view="pruebas">📖 Pruebas</button>
     <button class="nb" data-view="evolucion">📈 Evolución</button>
     <button class="nb" data-view="resumen">🏫 Resumen</button>
+    <button class="nb" data-view="informe">📄 Informe</button>
   </nav>
 </header>
 
@@ -610,6 +630,7 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
   <button class="bb" data-view="pruebas"><span class="bi">📖</span><span class="bl">Pruebas</span></button>
   <button class="bb" data-view="evolucion"><span class="bi">📈</span><span class="bl">Evolución</span></button>
   <button class="bb" data-view="resumen"><span class="bi">🏫</span><span class="bl">Resumen</span></button>
+  <button class="bb" data-view="informe"><span class="bi">📄</span><span class="bl">Informe</span></button>
 </div>
 </div>
 
@@ -720,7 +741,7 @@ let INIT={'1º':[],'2º':[],'3º':[],'4º':[],'5º':[],'6º':[]};
 let S={
   cursos:{}, ca:'5º', ta:0, vista:(location.hash==='#pruebas'?'pruebas':'notas'),
   anio:(function(){try{return localStorage.getItem('capi_registro_anio')||'2026-27'}catch(e){return '2026-27'}})(),
-  evoCat:'media',
+  evoCat:'media', infAmb:'clase',
   ae:null, agraf:{},
   _saving:false, _inputting:false,
 };
@@ -811,6 +832,7 @@ function render(){
   else if(S.vista==='graficas') mc.innerHTML=viewGraficas();
   else if(S.vista==='pruebas')  mc.innerHTML=viewPruebas();
   else if(S.vista==='evolucion')mc.innerHTML=viewEvolucion();
+  else if(S.vista==='informe')  mc.innerHTML=viewInforme();
   else                          mc.innerHTML=viewResumen();
   bind();
   if(S.vista==='pruebas')  bindPruebas();
@@ -818,6 +840,7 @@ function render(){
   if(S.vista==='graficas') buildGrafCharts();
   if(S.vista==='resumen')  buildResCharts();
   if(S.vista==='graficas'||S.vista==='resumen') bindGx();
+  if(S.vista==='informe'){bindGx();bindInf();}
 }
 
 function renderChips(){
@@ -1265,6 +1288,341 @@ function buildResCharts(){
       label:cid,data:TS.map((_,t)=>mediaClase(cid,t,cat.key)),backgroundColor:colors[i%colors.length],borderRadius:5,borderSkipped:'bottom',maxBarThickness:26,categoryPercentage:0.75,barPercentage:0.86,
     }))},options:o}));
   });
+}
+
+// ══════════════════════════════════════════════════════════════
+// VIEW INFORME · informe de resultados (sin IA y con IA)
+// Disponible para dirección y para cualquier tutora.
+// El alumnado aparece SIEMPRE con siglas, nunca con nombres.
+// ══════════════════════════════════════════════════════════════
+const INF_IDEAS={
+  vl:'Diez minutos diarios de lectura en voz alta: el mismo texto dos o tres veces, cronometrando y anotando la mejora.',
+  cl:'Después de cada lectura, dos preguntas de las que no se contestan copiando («¿por qué…?», «¿qué habría pasado si…?») y un resumen oral en tres frases.',
+  eo:'Una exposición corta por semana (uno o dos minutos) con un guion de tres puntos y una rúbrica sencilla que conozcan de antemano.',
+  calc:'Cinco minutos de cálculo mental al empezar la clase, con las tablas y las operaciones del trimestre, anotando el resultado para que vean su progreso.',
+  rp:'Resolver los problemas siempre con los mismos cuatro pasos: entiendo, pienso, calculo y compruebo; empezar por problemas sin números para centrar la atención en el razonamiento.'
+};
+
+function infAmb(){ return S.infAmb==='centro'?'centro':'clase'; }
+function infPct(a,b){ return b?Math.round(a/b*100):0; }
+const INF_NIV=['nivel bajo','nivel medio','buen nivel','nivel muy alto'];
+function infNivelTxt(v){ const l=nivel(v); return l<0?'sin datos':INF_NIV[l]; }
+function infDeltaPalabra(d){
+  if(d===null||d===undefined||isNaN(d))return '–';
+  if(Math.abs(d)<0.05)return 'igual';
+  return (d>0?'sube ':'baja ')+fx(Math.abs(d));
+}
+function infAl(n){ return n===1?'1 alumno o alumna':n+' alumnos o alumnas'; }
+function infDeltaCorto(d){
+  if(d===null||d===undefined||isNaN(d))return '–';
+  if(Math.abs(d)<0.05)return '= igual';
+  return (d>0?'▲ +':'▼ −')+fx(Math.abs(d));
+}
+function infDelta(d){
+  if(d===null||d===undefined||isNaN(d))return '';
+  if(Math.abs(d)<0.05)return 'igual que el trimestre anterior';
+  return (d>0?'sube ':'baja ')+fx(Math.abs(d))+' puntos respecto al trimestre anterior';
+}
+
+// ── modelo de datos del informe ───────────────────────────────
+function infModelo(){
+  const amb=infAmb(), ti=S.ta;
+  const cids=amb==='centro'?cursosReales():[S.ca];
+  const grupos=cids.map(cid=>{
+    const c=S.cursos[cid]||{alumnos:[],notas:{}};
+    const als=ordenarAlumnos(c.alumnos||[]);
+    const sgs=siglasUnicas(als.map(a=>a.nombre));
+    const filas=als.map((a,i)=>({sg:sgs[i]||'', v:CATS.map(cat=>notaFinal(c.notas[a.id]&&c.notas[a.id][ti],cat.key)), m:mediaAlumno(cid,a.id,ti,'media')}));
+    const con=filas.filter(f=>f.m!==null);
+    const cnt=[0,0,0,0]; con.forEach(f=>cnt[nivel(f.m)]++);
+    return {cid, filas, con, n:con.length, total:als.length, cnt,
+      media:gxMedia(con.map(f=>f.m)),
+      prev:ti>0?mediaCursoGlobal(cid,ti-1,'media'):null,
+      cat:CATS.map(cat=>mediaClase(cid,ti,cat.key)),
+      catPrev:ti>0?CATS.map(cat=>mediaClase(cid,ti-1,cat.key)):CATS.map(()=>null),
+      evol:TS.map((_,t)=>mediaCursoGlobal(cid,t,'media'))};
+  });
+  const con=grupos.filter(g=>g.n>0);
+  const n=grupos.reduce((a,g)=>a+g.n,0), total=grupos.reduce((a,g)=>a+g.total,0);
+  const cnt=[0,0,0,0]; grupos.forEach(g=>g.cnt.forEach((x,i)=>cnt[i]+=x));
+  const cat=amb==='centro'?CATS.map((c,i)=>gxMedia(con.map(g=>g.cat[i]))):(grupos[0]?grupos[0].cat:CATS.map(()=>null));
+  const catPrev=amb==='centro'?CATS.map((c,i)=>gxMedia(con.map(g=>g.catPrev[i]))):(grupos[0]?grupos[0].catPrev:CATS.map(()=>null));
+  const media=amb==='centro'?gxMedia(con.map(g=>g.media)):(grupos[0]?grupos[0].media:null);
+  const prev=amb==='centro'?(ti>0?mediaCentro(ti-1,'media'):null):(grupos[0]?grupos[0].prev:null);
+  const evol=amb==='centro'?TS.map((_,t)=>mediaCentro(t,'media')):(grupos[0]?grupos[0].evol:[null,null,null]);
+  const catEvol=CATS.map(c=>TS.map((_,t)=>amb==='centro'?gxMedia(cids.map(x=>mediaClase(x,t,c.key))):mediaClase(cids[0],t,c.key)));
+  const ok=cat.map((v,i)=>v===null?null:i).filter(i=>i!==null);
+  const best=ok.length?ok.reduce((a,b)=>cat[b]>cat[a]?b:a):null;
+  const worst=ok.length?ok.reduce((a,b)=>cat[b]<cat[a]?b:a):null;
+  return {amb, ti, cids, grupos, con, n, total, cnt, cat, catPrev, media, prev, evol, catEvol, best, worst,
+    titulo: amb==='centro'?'Informe de resultados del centro':('Informe de resultados de '+S.ca),
+    ambTxt: amb==='centro'?'todo el centro':S.ca,
+    fecha: new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'}),
+    vacio: !con.length};
+}
+
+// ── propuestas automáticas (sin IA) ───────────────────────────
+function infPropuestas(d){
+  const out=[];
+  if(d.n<d.total) out.push('Faltan las notas de '+(d.total-d.n)+' de los '+d.total+' alumnos y alumnas. Conviene completarlas antes de presentar el informe, porque las medias se calculan solo con quienes tienen nota.');
+  if(d.worst!==null&&d.cat[d.worst]!==null&&d.cat[d.worst]<7) out.push('El indicador más bajo es '+CATS[d.worst].label.toLowerCase()+' ('+fx(d.cat[d.worst])+'). '+INF_IDEAS[CATS[d.worst].key]);
+  const bajo=d.cnt[0], pc=infPct(bajo,d.n);
+  if(bajo) out.push(infAl(bajo)+' ('+pc+' %) '+(bajo===1?'tiene':'tienen')+' una media por debajo de 5. '+(pc>25?'Es un porcentaje alto: merece la pena revisar el refuerzo del grupo y, si hace falta, pedir apoyo de PT o AL.':'Conviene un seguimiento individual y avisar a las familias en la próxima tutoría.'));
+  if(d.prev!==null&&d.media!==null){
+    const dd=d.media-d.prev;
+    if(dd<=-0.3) out.push('La media global baja '+fx(Math.abs(dd))+' puntos respecto al trimestre anterior. Antes de sacar conclusiones conviene comprobar si la prueba fue más difícil o si falta alumnado por evaluar.');
+    else if(dd>=0.3) out.push('La media global sube '+fx(dd)+' puntos respecto al trimestre anterior: lo que se está haciendo funciona y conviene mantenerlo el próximo trimestre.');
+  }
+  if(d.best!==null&&d.best!==d.worst&&d.cat[d.best]!==null) out.push('El punto fuerte es '+CATS[d.best].label.toLowerCase()+' ('+fx(d.cat[d.best])+'). Se puede aprovechar para tirar del resto: por ejemplo, apoyar la resolución de problemas en la comprensión lectora.');
+  if(d.amb==='centro'&&d.con.length>1){
+    const o=[...d.con].sort((a,b)=>a.media-b.media);
+    if(o.length>1&&o[o.length-1].media-o[0].media>=1.5) out.push('Hay '+fx(o[o.length-1].media-o[0].media)+' puntos de diferencia entre '+o[o.length-1].cid+' y '+o[0].cid+'. Conviene revisar en ciclo si las pruebas se están aplicando y corrigiendo con los mismos criterios.');
+  }
+  if(!out.length) out.push('Los resultados están equilibrados y no se detecta ningún indicador especialmente bajo. Conviene mantener el trabajo diario y volver a revisar los datos al cierre del siguiente trimestre.');
+  return out;
+}
+
+// ── filas del alumnado (solo siglas) ──────────────────────────
+function infFilasAlumnado(d){
+  const out=[];
+  d.grupos.forEach(g=>g.filas.forEach(f=>{ if(f.m!==null) out.push({cid:g.cid, sg:f.sg, v:f.v, m:f.m}); }));
+  return out.sort((a,b)=>b.m-a.m);
+}
+
+// ── vista ─────────────────────────────────────────────────────
+function viewInforme(){
+  const d=infModelo();
+  const seg=`<div class="inf-ctrl">
+    <span class="gx-seg2"><button class="${d.amb==='clase'?'on':''}" data-infamb="clase">👩‍🏫 Mi clase (${S.ca})</button><button class="${d.amb==='centro'?'on':''}" data-infamb="centro">🏫 Todo el centro</button></span>
+    <span class="gx-seg2">${TS.map((t,i)=>`<button class="${i===d.ti?'on':''}" data-gxtrim="${i}">${t}</button>`).join('')}</span>
+  </div>`;
+  const cab=`<div class="card glass"><div class="ct" style="margin-bottom:10px">📄 Informe de resultados <span class="gx-cts">curso ${anioLabel(S.anio)}</span></div>
+    <p class="gx-p">Elige de quién quieres el informe y de qué trimestre. Se genera con los datos que ya están en la app y lo puedes descargar en Word, imprimirlo o pedirle a una IA que lo redacte por ti.</p>${seg}</div>`;
+  if(d.vacio) return `<div class="gx${gxAnimCls()}">${cab}${gxVacio(`Todavía no hay notas de <b>${d.ambTxt}</b> en el <b>${TRIMS[d.ti]}</b>.<br>Cuando se apunten en «Notas», aquí podrás generar el informe.`)}</div>`;
+
+  const acciones=`<div class="card glass">
+    <div class="ct">⬇️ Informe sin IA <span class="gx-cts">lo escribe la app con tus datos</span></div>
+    <p class="gx-p">Listo para la memoria de autoevaluación, el ETCP o la reunión de ciclo. No sale de tu dispositivo.</p>
+    <div class="inf-btns">
+      <button class="btnp" id="inf-word">📄 Descargar en Word</button>
+      <button class="btns" id="inf-print">🖨️ Imprimir o guardar en PDF</button>
+      <button class="btns" id="inf-copy">📋 Copiar el texto</button>
+    </div></div>
+  <div class="card glass">
+    <div class="ct">✨ Informe con IA <span class="gx-cts">Gemini o Claude lo redactan</span></div>
+    <p class="gx-p">Se copia al portapapeles el texto con los datos y las instrucciones; después se abre la IA y solo tienes que pegarlo (Ctrl + V) y enviar.</p>
+    <div class="inf-aviso">🔒 <b>Sin nombres.</b> Al alumnado se le envía solo con sus siglas, nunca con el nombre y los apellidos.</div>
+    <div class="inf-btns">
+      <button class="btnp" id="inf-gemini" style="background:linear-gradient(135deg,#4285f4,#9b72cb)">✨ Preparar para Gemini</button>
+      <button class="btnp" id="inf-claude" style="background:linear-gradient(135deg,#d97757,#b8582f)">✨ Preparar para Claude</button>
+      <button class="btns" id="inf-verprompt">👁️ Ver lo que se envía</button>
+    </div>
+    <div id="inf-prompt-box" style="display:none"><textarea id="inf-prompt" class="inf-ta" readonly></textarea></div>
+  </div>`;
+
+  return `<div class="gx${gxAnimCls()}">${cab}${acciones}
+    <div class="card glass inf-hoja"><div class="ct">👀 Vista previa</div>${infHTML(d)}</div></div>`;
+}
+
+// ── cuerpo del informe en HTML ────────────────────────────────
+function infHTML(d){
+  const cab=CATS.map(c=>`<th>${c.short}</th>`).join('');
+  const tCat=`<table class="inf-t"><tr><th>Indicador</th><th>Media</th><th>Nivel</th><th>Respecto al ${d.ti>0?TS[d.ti-1]:'trimestre anterior'}</th></tr>
+    ${CATS.map((c,i)=>`<tr><td><i class="inf-dot" style="background:${c.color}"></i>${c.label}</td><td class="inf-n">${fx(d.cat[i])}</td><td>${infNivelTxt(d.cat[i])}</td><td class="inf-n">${d.catPrev[i]===null||d.cat[i]===null?'–':infDeltaCorto(d.cat[i]-d.catPrev[i])}</td></tr>`).join('')}</table>`;
+  const tNiv=`<table class="inf-t"><tr><th>Nivel</th><th>Alumnado</th><th>%</th></tr>
+    ${NIV.map((nv,i)=>`<tr><td><i class="inf-dot" style="background:${nv.c}"></i>${nv.ico} ${nv.label}</td><td class="inf-n">${d.cnt[i]}</td><td class="inf-n">${infPct(d.cnt[i],d.n)} %</td></tr>`).join('')}</table>`;
+  const tGrup=d.amb==='centro'?`<h4>Resultados por curso</h4><table class="inf-t"><tr><th>Curso</th>${cab}<th>Media</th><th>Con notas</th></tr>
+    ${d.grupos.map(g=>`<tr><td><b>${g.cid}</b></td>${g.cat.map(v=>`<td class="inf-n">${fx(v)}</td>`).join('')}<td class="inf-n"><b>${fx(g.media)}</b></td><td class="inf-n">${g.n}/${g.total}</td></tr>`).join('')}</table>`:'';
+  const fil=infFilasAlumnado(d);
+  const tAl=`<h4>Alumnado${d.amb==='centro'?' del centro':''} <span class="inf-sg">(por siglas, de mayor a menor media)</span></h4>
+    <table class="inf-t"><tr>${d.amb==='centro'?'<th>Curso</th>':''}<th>Alumno/a</th>${cab}<th>Media</th></tr>
+    ${fil.map(f=>`<tr>${d.amb==='centro'?`<td>${f.cid}</td>`:''}<td><b>${f.sg}</b></td>${f.v.map(v=>`<td class="inf-n">${fx(v)}</td>`).join('')}<td class="inf-n" style="background:${nivel(f.m)<0?'transparent':NIV[nivel(f.m)].bg};color:${nivel(f.m)<0?'inherit':NIV[nivel(f.m)].tx}"><b>${fx(f.m)}</b></td></tr>`).join('')}</table>`;
+  const bajos=fil.filter(f=>f.m<5);
+  const tEvo=`<table class="inf-t"><tr><th>Indicador</th>${TS.map(t=>`<th>${t}</th>`).join('')}</tr>
+    ${CATS.map((c,i)=>`<tr><td><i class="inf-dot" style="background:${c.color}"></i>${c.label}</td>${d.catEvol[i].map(v=>`<td class="inf-n">${fx(v)}</td>`).join('')}</tr>`).join('')}
+    <tr><td><b>Media global</b></td>${d.evol.map(v=>`<td class="inf-n"><b>${fx(v)}</b></td>`).join('')}</tr></table>`;
+  return `<div class="inf-doc">
+    <h3>${d.titulo}</h3>
+    <p class="inf-sub">CEIP Capitulaciones de Santa Fe · Curso ${anioLabel(S.anio)} · ${TRIMS[d.ti]} · ${d.fecha}</p>
+    <h4>1. De un vistazo</h4>
+    <p>Este informe recoge los resultados de <b>${d.ambTxt}</b> en el <b>${TRIMS[d.ti]}</b> del curso ${anioLabel(S.anio)}. Tienen nota <b>${d.n}</b> de los <b>${d.total}</b> alumnos y alumnas (${infPct(d.n,d.total)} %)${d.amb==='centro'?' en '+d.con.length+' de los '+d.cids.length+' cursos':''}.</p>
+    <p>La media global es de <b>${fx(d.media)} sobre 10</b> (${infNivelTxt(d.media)})${d.prev!==null?', '+infDelta(d.media-d.prev):''}. ${d.cnt[0]?'Están por debajo de 5 <b>'+infAl(d.cnt[0])+'</b> ('+infPct(d.cnt[0],d.n)+' %).':'<b>Todo el alumnado evaluado llega al 5.</b>'}</p>
+    ${d.best!==null?`<p>El indicador más alto es <b>${CATS[d.best].label.toLowerCase()}</b> (${fx(d.cat[d.best])})${d.worst!==null&&d.worst!==d.best?` y el más bajo, <b>${CATS[d.worst].label.toLowerCase()}</b> (${fx(d.cat[d.worst])})`:''}.</p>`:''}
+    <h4>2. Los cinco indicadores</h4>${tCat}
+    <h4>3. Cómo se reparte el alumnado</h4>${tNiv}
+    ${tGrup}
+    <h4>${d.amb==='centro'?'5':'4'}. Evolución a lo largo del curso</h4>${tEvo}
+    <h4>${d.amb==='centro'?'6':'5'}. Propuestas de mejora</h4>
+    <ol class="inf-ol">${infPropuestas(d).map(p=>`<li>${p}</li>`).join('')}</ol>
+    ${bajos.length?`<h4>${d.amb==='centro'?'7':'6'}. Seguimiento individual</h4><p>Conviene seguir de cerca a: <b>${bajos.map(f=>f.sg+(d.amb==='centro'?' ('+f.cid+')':'')).join(' · ')}</b>.</p>`:''}
+    <h4>${d.amb==='centro'?(bajos.length?'8':'7'):(bajos.length?'7':'6')}. Datos completos</h4>${tAl}
+    <p class="inf-pie">Documento generado automáticamente con la aplicación de Registro del CEIP Capitulaciones de Santa Fe. El alumnado aparece con siglas para proteger sus datos personales.</p>
+  </div>`;
+}
+
+// ── texto plano (copiar / IA) ─────────────────────────────────
+function infTabla(filas){ return filas.map(f=>'| '+f.join(' | ')+' |').join('\n'); }
+function infTexto(d,paraIA){
+  const L=[];
+  L.push('# '+d.titulo);
+  L.push('CEIP Capitulaciones de Santa Fe · Curso '+anioLabel(S.anio)+' · '+TRIMS[d.ti]+' · '+d.fecha);
+  L.push('');
+  L.push('Alumnado con nota: '+d.n+' de '+d.total+' ('+infPct(d.n,d.total)+' %).');
+  L.push('Media global: '+fx(d.media)+' sobre 10'+(d.prev!==null?' ('+infDelta(d.media-d.prev)+')':'')+'.');
+  L.push('');
+  L.push('## Medias por indicador (sobre 10)');
+  L.push('| Indicador | Media | '+TS.join(' | ')+' |');
+  L.push('|---|---|---|---|---|');
+  CATS.forEach((c,i)=>L.push('| '+c.label+' | '+fx(d.cat[i])+' | '+d.catEvol[i].map(v=>fx(v)).join(' | ')+' |'));
+  L.push('| Media global | '+fx(d.media)+' | '+d.evol.map(v=>fx(v)).join(' | ')+' |');
+  L.push('');
+  L.push('## Reparto del alumnado por niveles');
+  L.push('| Nivel | Alumnado | % |');
+  L.push('|---|---|---|');
+  NIV.forEach((nv,i)=>L.push('| '+nv.label+' | '+d.cnt[i]+' | '+infPct(d.cnt[i],d.n)+' % |'));
+  L.push('');
+  if(d.amb==='centro'){
+    L.push('## Resultados por curso');
+    L.push('| Curso | '+CATS.map(c=>c.short).join(' | ')+' | Media | Con notas |');
+    L.push('|---|---|---|---|---|---|---|---|');
+    d.grupos.forEach(g=>L.push('| '+g.cid+' | '+g.cat.map(v=>fx(v)).join(' | ')+' | '+fx(g.media)+' | '+g.n+'/'+g.total+' |'));
+    L.push('');
+  }
+  L.push('## Alumnado (siglas, sin nombres)');
+  L.push('| '+(d.amb==='centro'?'Curso | ':'')+'Alumno/a | '+CATS.map(c=>c.short).join(' | ')+' | Media |');
+  L.push('|---|---|---|---|---|---|---|'+(d.amb==='centro'?'---|':''));
+  infFilasAlumnado(d).forEach(f=>L.push('| '+(d.amb==='centro'?f.cid+' | ':'')+f.sg+' | '+f.v.map(v=>fx(v)).join(' | ')+' | '+fx(f.m)+' |'));
+  if(!paraIA){
+    L.push('');
+    L.push('## Propuestas de mejora');
+    infPropuestas(d).forEach((p,i)=>L.push((i+1)+'. '+p));
+    L.push('');
+    L.push('Documento generado con la aplicación de Registro del CEIP Capitulaciones de Santa Fe.');
+  }
+  return L.join('\n');
+}
+
+function infPrompt(d){
+  return [
+ 'Eres un asesor de formación con experiencia en Educación Primaria en Andalucía. Redacta un informe de resultados a partir de los datos que te paso.',
+ '',
+ 'CONTEXTO',
+ '- Centro: CEIP Capitulaciones de Santa Fe (Granada), colegio público de Infantil y Primaria.',
+ '- Ámbito del informe: '+d.ambTxt+'.',
+ '- Periodo: '+TRIMS[d.ti]+' del curso '+anioLabel(S.anio)+'.',
+ '- Los cinco indicadores se puntúan de 0 a 10: velocidad lectora, comprensión lectora, expresión oral, cálculo y resolución de problemas. Forman parte del Plan de Lectura y del trabajo de matemáticas del centro.',
+ '- El alumnado aparece solo con siglas. No inventes nombres ni intentes identificar a nadie.',
+ '',
+ 'QUÉ QUIERO',
+ 'Un informe en español de España, claro y breve (entre 500 y 700 palabras), con este orden:',
+ '1. Un párrafo de resumen que se entienda de una lectura.',
+ '2. Qué dicen los datos: fortalezas y puntos débiles, comentando los cinco indicadores y la evolución entre trimestres.',
+ '3. Alumnado que necesita seguimiento (solo siglas) y por qué.',
+ '4. Entre cuatro y seis propuestas de mejora concretas y realistas para un colegio público, que se puedan poner en marcha el próximo trimestre y digan quién las hace y cuándo.',
+ '5. Dos o tres indicadores sencillos para comprobar el próximo trimestre si han funcionado.',
+ '',
+ 'CÓMO ESCRIBIRLO',
+ '- Tono profesional y cercano, sin palabrería ni frases hechas de informe.',
+ '- No inventes datos que no estén en la tabla; si algo no se puede saber, dilo.',
+ '- Sirve para la memoria de autoevaluación, así que evita juicios sobre el profesorado.',
+ '',
+ 'DATOS',
+ infTexto(d,true)
+  ].join('\n');
+}
+
+// ── Word ──────────────────────────────────────────────────────
+async function infWord(){
+  const d=infModelo();
+  await pwPreparar();
+  const col='#2f6fed';
+  const ch=[];
+  const t=(filas,anchos,cabecera)=>T(filas,{anchos,cabecera:cabecera||'#EEF3FF',celda:{sz:10}});
+  ch.push(P(d.titulo,{b:true,sz:17,al:'c',after:0}));
+  ch.push(P('CEIP Capitulaciones de Santa Fe · Curso '+anioLabel(S.anio)+' · '+TRIMS[d.ti]+' · '+d.fecha,{sz:10.5,c:'#777777',al:'c',after:160}));
+  ch.push(H('1. De un vistazo',col,13,{before:0}));
+  ch.push(P('Este informe recoge los resultados de **'+d.ambTxt+'** en el **'+TRIMS[d.ti]+'** del curso '+anioLabel(S.anio)+'. Tienen nota **'+d.n+'** de los **'+d.total+'** alumnos y alumnas ('+infPct(d.n,d.total)+' %).',{sz:11}));
+  ch.push(P('La media global es de **'+fx(d.media)+' sobre 10** ('+infNivelTxt(d.media)+')'+(d.prev!==null?', '+infDelta(d.media-d.prev):'')+'. '+(d.cnt[0]?'Están por debajo de 5 **'+infAl(d.cnt[0])+'** ('+infPct(d.cnt[0],d.n)+' %).':'**Todo el alumnado evaluado llega al 5.**'),{sz:11}));
+  ch.push(H('2. Los cinco indicadores',col));
+  ch.push(t([['Indicador','Media','Nivel','Respecto al '+(d.ti>0?TS[d.ti-1]:'trimestre anterior')]].concat(CATS.map((c,i)=>[c.label,fx(d.cat[i]),infNivelTxt(d.cat[i]),(d.catPrev[i]===null||d.cat[i]===null)?'–':infDeltaPalabra(d.cat[i]-d.catPrev[i])])),anchosPct([34,12,20,34])));
+  ch.push(H('3. Cómo se reparte el alumnado',col));
+  ch.push(t([['Nivel','Alumnado','Porcentaje']].concat(NIV.map((nv,i)=>[nv.label,String(d.cnt[i]),infPct(d.cnt[i],d.n)+' %'])),anchosPct([50,25,25])));
+  let n=4;
+  if(d.amb==='centro'){
+    ch.push(H('4. Resultados por curso',col));
+    ch.push(t([['Curso'].concat(CATS.map(c=>c.short)).concat(['Media','Con notas'])].concat(d.grupos.map(g=>[g.cid].concat(g.cat.map(v=>fx(v))).concat([fx(g.media),g.n+'/'+g.total]))),anchosPct([14,12,12,12,12,12,13,13])));
+    n=5;
+  }
+  ch.push(H(n+'. Evolución a lo largo del curso',col)); n++;
+  ch.push(t([['Indicador'].concat(TS)].concat(CATS.map((c,i)=>[c.label].concat(d.catEvol[i].map(v=>fx(v))))).concat([['Media global'].concat(d.evol.map(v=>fx(v)))]),anchosPct([40,20,20,20])));
+  ch.push(H(n+'. Propuestas de mejora',col)); n++;
+  infPropuestas(d).forEach((p,i)=>ch.push(P((i+1)+'.  '+p,{sz:11,ind:360,hang:360,after:80})));
+  const fil=infFilasAlumnado(d), bajos=fil.filter(f=>f.m<5);
+  if(bajos.length){
+    ch.push(H(n+'. Seguimiento individual',col)); n++;
+    ch.push(P('Conviene seguir de cerca a: **'+bajos.map(f=>f.sg+(d.amb==='centro'?' ('+f.cid+')':'')).join(' · ')+'**.',{sz:11}));
+  }
+  ch.push(H(n+'. Datos completos del alumnado',col));
+  const cabA=(d.amb==='centro'?['Curso']:[]).concat(['Alumno/a']).concat(CATS.map(c=>c.short)).concat(['Media']);
+  const anA=d.amb==='centro'?anchosPct([12,16,12,12,12,12,12,12]):anchosPct([24,13,13,13,13,13,11]);
+  ch.push(t([cabA].concat(fil.map(f=>(d.amb==='centro'?[f.cid]:[]).concat([f.sg]).concat(f.v.map(v=>fx(v))).concat([fx(f.m)]))),anA));
+  ch.push(P('Documento generado con la aplicación de Registro del CEIP Capitulaciones de Santa Fe. El alumnado aparece con siglas para proteger sus datos personales.',{sz:9.5,c:'#777777',before:160}));
+  const nom='Informe_'+(d.amb==='centro'?'centro':S.ca.replace(/[^\wºª]/g,''))+'_'+TS[d.ti]+'_'+S.anio+'.docx';
+  await pwDescargar(nom,d.titulo,[hoja(['Informe de resultados',TRIMS[d.ti]+' · '+anioLabel(S.anio),col],ch)]);
+}
+
+// ── imprimir ──────────────────────────────────────────────────
+function infImprimir(){
+  const d=infModelo();
+  const w=window.open('','_blank');
+  if(!w){alert('El navegador ha bloqueado la ventana de impresión. Permite las ventanas emergentes e inténtalo otra vez.');return;}
+  w.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>'+d.titulo+'</title><style>'+
+    'body{font-family:Calibri,Segoe UI,Arial,sans-serif;color:#1a2340;max-width:800px;margin:28px auto;padding:0 18px;line-height:1.5}'+
+    'h3{font-size:22px;text-align:center;margin:0}h4{color:#2f6fed;margin:22px 0 8px;font-size:15px}'+
+    '.inf-sub{text-align:center;color:#777;font-size:12px;margin:4px 0 18px}'+
+    'table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0 14px}'+
+    'th,td{border:1px solid #c9d3e8;padding:5px 7px;text-align:left}th{background:#eef3ff}'+
+    '.inf-n{text-align:center}.inf-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}'+
+    '.inf-ol li{margin-bottom:7px}.inf-pie{color:#777;font-size:11px;margin-top:22px}.inf-sg{font-weight:400;color:#777;font-size:12px}'+
+    '@page{size:A4;margin:16mm}</style></head><body>'+infHTML(d)+'</body></html>');
+  w.document.close();
+  setTimeout(()=>{w.focus();w.print();},400);
+}
+
+// ── portapapeles ──────────────────────────────────────────────
+function infCopiar(txt,btn,ok){
+  const fin=b=>{const o=btn.textContent;btn.textContent=b?('✅ '+ok):'⚠️ No se ha podido copiar';setTimeout(()=>btn.textContent=o,2200);};
+  if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(txt).then(()=>fin(true),()=>fin(false));
+  else{
+    const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();let b=false;try{b=document.execCommand('copy');}catch(e){}
+    ta.remove();fin(b);
+  }
+}
+function infIA(url,btn){
+  const d=infModelo(), p=infPrompt(d);
+  const w=window.open(url,'_blank');
+  if(w){try{w.opener=null;}catch(e){}}
+  infCopiar(p,btn,'Copiado: pégalo con Ctrl + V');
+  const box=document.getElementById('inf-prompt-box'), ta=document.getElementById('inf-prompt');
+  if(box&&ta){ta.value=p;box.style.display='block';}
+}
+
+function bindInf(){
+  document.querySelectorAll('[data-infamb]').forEach(b=>b.addEventListener('click',()=>{S.infAmb=b.dataset.infamb;render();}));
+  const w=document.getElementById('inf-word');
+  if(w) w.addEventListener('click',()=>{const o=w.textContent;w.disabled=true;w.textContent='⏳ Generando…';
+    infWord().then(()=>{w.textContent='✅ Descargado';setTimeout(()=>{w.textContent=o;w.disabled=false;},2200);})
+    .catch(e=>{w.textContent=o;w.disabled=false;alert('No se ha podido generar el Word: '+(e&&e.message?e.message:e));});});
+  document.getElementById('inf-print')?.addEventListener('click',infImprimir);
+  const c=document.getElementById('inf-copy');
+  if(c) c.addEventListener('click',()=>infCopiar(infTexto(infModelo(),false),c,'Informe copiado'));
+  document.getElementById('inf-gemini')?.addEventListener('click',e=>infIA('https://gemini.google.com/app',e.currentTarget));
+  document.getElementById('inf-claude')?.addEventListener('click',e=>infIA('https://claude.ai/new',e.currentTarget));
+  const v=document.getElementById('inf-verprompt');
+  if(v) v.addEventListener('click',()=>{const box=document.getElementById('inf-prompt-box'),ta=document.getElementById('inf-prompt');
+    if(!box)return; if(box.style.display==='none'){ta.value=infPrompt(infModelo());box.style.display='block';v.textContent='🙈 Ocultar';}
+    else{box.style.display='none';v.textContent='👁️ Ver lo que se envía';}});
 }
 
 // ── eventos del panel ─────────────────────────────────────────
@@ -2996,13 +3354,13 @@ document.getElementById('sn-modal').addEventListener('click',e=>{if(e.target.id=
 
 // ── Aviso de novedades (sale una sola vez en cada dispositivo) ──
 (function(){
-  const ID='2026-11-12-graficas';
+  const ID='2026-11-12-informe';
   try{ if(localStorage.getItem('capi_lyp_novedades')===ID) return; }catch(e){}
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px';
   d.innerHTML=`<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:Nunito,sans-serif;color:#1a2340">
     <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades</div>
-    <p style="font-size:13.5px;line-height:1.55;margin:0 0 14px">Nuevas <b>📊 Gráficas</b> de tu clase y nuevo <b>🏫 Resumen</b> del centro: medias, niveles, mapa de la clase y ficha de cada alumno. Las puede ver todo el profesorado.</p>
+    <p style="font-size:13.5px;line-height:1.55;margin:0 0 14px">Nueva pestaña <b>📄 Informe</b>: genera el informe de resultados de tu clase o de todo el centro y lo descargas en <b>Word</b>, lo imprimes o le pides a <b>Gemini</b> o <b>Claude</b> que lo redacte. El alumnado va siempre con siglas, nunca con nombres.</p>
     <button style="width:100%;border:none;border-radius:12px;padding:10px;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,#4f7ef8,#7c9edf);cursor:pointer">Entendido</button></div>`;
   d.querySelector('button').onclick=()=>{try{localStorage.setItem('capi_lyp_novedades',ID)}catch(e){} d.remove();};
   document.body.appendChild(d);
