@@ -741,7 +741,7 @@ let INIT={'1º':[],'2º':[],'3º':[],'4º':[],'5º':[],'6º':[]};
 let S={
   cursos:{}, ca:'5º', ta:0, vista:(location.hash==='#pruebas'?'pruebas':'notas'),
   anio:(function(){try{return localStorage.getItem('capi_registro_anio')||'2026-27'}catch(e){return '2026-27'}})(),
-  evoCat:'media', infAmb:'clase',
+  evoCat:'media', infAmb:'clase', infIA:'html',
   ae:null, agraf:{},
   _saving:false, _inputting:false,
 };
@@ -1411,6 +1411,10 @@ function viewInforme(){
   <div class="card glass">
     <div class="ct">✨ Informe con IA <span class="gx-cts">Gemini o Claude lo redactan</span></div>
     <p class="gx-p">Se copia al portapapeles el texto con los datos y las instrucciones; después se abre la IA y solo tienes que pegarlo (Ctrl + V) y enviar.</p>
+    <div class="inf-ctrl" style="margin-bottom:10px">
+      <span class="gx-seg2"><button class="${S.infIA!=='texto'?'on':''}" data-infia="html">🎨 Informe con diseño (para PDF)</button><button class="${S.infIA==='texto'?'on':''}" data-infia="texto">📝 Solo texto redactado</button></span>
+    </div>
+    ${S.infIA!=='texto'?`<div class="inf-aviso" style="background:#f3f0ff;border-color:#ddd4fb;color:#4a3c86">📄 <b>Para sacar el PDF:</b> la IA te devolverá el código de una página web. Descarga el archivo <b>.html</b> (o pega el código en el Bloc de notas y guárdalo como <b>informe.html</b>), ábrelo con doble clic y pulsa <b>Ctrl + P</b> → <b>Guardar como PDF</b>, marcando la casilla <b>«Gráficos de fondo»</b> para que salgan los colores.</div>`:''}
     <div class="inf-aviso">🔒 <b>Sin nombres.</b> Al alumnado se le envía solo con sus siglas, nunca con el nombre y los apellidos.</div>
     <div class="inf-btns">
       <button class="btnp" id="inf-gemini" style="background:linear-gradient(135deg,#4285f4,#9b72cb)">✨ Preparar para Gemini</button>
@@ -1503,18 +1507,16 @@ function infTexto(d,paraIA){
 }
 
 function infPrompt(d){
-  return [
- 'Eres un asesor de formación con experiencia en Educación Primaria en Andalucía. Redacta un informe de resultados a partir de los datos que te paso.',
- '',
+  const cab=[
  'CONTEXTO',
  '- Centro: CEIP Capitulaciones de Santa Fe (Granada), colegio público de Infantil y Primaria.',
  '- Ámbito del informe: '+d.ambTxt+'.',
  '- Periodo: '+TRIMS[d.ti]+' del curso '+anioLabel(S.anio)+'.',
  '- Los cinco indicadores se puntúan de 0 a 10: velocidad lectora, comprensión lectora, expresión oral, cálculo y resolución de problemas. Forman parte del Plan de Lectura y del trabajo de matemáticas del centro.',
  '- El alumnado aparece solo con siglas. No inventes nombres ni intentes identificar a nadie.',
- '',
- 'QUÉ QUIERO',
- 'Un informe en español de España, claro y breve (entre 500 y 700 palabras), con este orden:',
+ ''];
+  const contenido=[
+ 'CONTENIDO (en este orden)',
  '1. Un párrafo de resumen que se entienda de una lectura.',
  '2. Qué dicen los datos: fortalezas y puntos débiles, comentando los cinco indicadores y la evolución entre trimestres.',
  '3. Alumnado que necesita seguimiento (solo siglas) y por qué.',
@@ -1522,13 +1524,34 @@ function infPrompt(d){
  '5. Dos o tres indicadores sencillos para comprobar el próximo trimestre si han funcionado.',
  '',
  'CÓMO ESCRIBIRLO',
- '- Tono profesional y cercano, sin palabrería ni frases hechas de informe.',
- '- No inventes datos que no estén en la tabla; si algo no se puede saber, dilo.',
+ '- Español de España, tono profesional y cercano, sin palabrería ni frases hechas de informe.',
+ '- No inventes ningún dato que no esté en las tablas; si algo no se puede saber, dilo.',
  '- Sirve para la memoria de autoevaluación, así que evita juicios sobre el profesorado.',
+ ''];
+  if(S.infIA==='texto'){
+    return ['Eres un asesor de formación con experiencia en Educación Primaria en Andalucía. Redacta un informe de resultados a partir de los datos que te paso.','']
+      .concat(cab)
+      .concat(['QUÉ QUIERO','Un informe escrito de entre 500 y 700 palabras.',''])
+      .concat(contenido).concat(['DATOS',infTexto(d,true)]).join('\n');
+  }
+  return ['Eres un asesor de formación con experiencia en Educación Primaria en Andalucía y además maquetas documentos. Con los datos que te paso, prepara un informe de resultados.','']
+    .concat(cab)
+    .concat([
+ 'QUÉ QUIERO',
+ 'Genera el informe en un único archivo HTML, con estilos CSS modernos dentro del propio archivo, maquetación de informe ejecutivo en tamaño A4 y gráficas integradas con SVG o con Chart.js. Que quede listo para imprimir en PDF.',
  '',
- 'DATOS',
- infTexto(d,true)
-  ].join('\n');
+ 'MAQUETACIÓN',
+ '- Portada breve con el título, el nombre del centro, el trimestre y el curso escolar.',
+ '- Tarjetas con los datos destacados (media global, alumnado evaluado, punto fuerte y punto a reforzar).',
+ '- Tablas limpias con los cinco indicadores, el reparto por niveles y la evolución por trimestres.',
+ '- Al menos dos gráficas: una de barras con las medias de los cinco indicadores y una de líneas con la evolución por trimestres.',
+ '- Colores: azul #2f6fed como color principal, morado #b93cc2, verde #0e9f8e, naranja #dd8a07 y rojo #e2453a para los indicadores; fondo blanco y texto oscuro. Nada de modo oscuro.',
+ '- Usa @page { size: A4; margin: 15mm } y evita que las tablas se partan entre páginas.',
+ '- Tipografía legible del sistema; nada de imágenes externas ni logotipos.',
+ '',
+ 'IMPORTANTE: dame el código HTML completo en un solo bloque, empezando por <!DOCTYPE html>, sin explicaciones alrededor.',
+ ''])
+    .concat(contenido).concat(['DATOS',infTexto(d,true)]).join('\n');
 }
 
 // ── Word ──────────────────────────────────────────────────────
@@ -1610,6 +1633,7 @@ function infIA(url,btn){
 
 function bindInf(){
   document.querySelectorAll('[data-infamb]').forEach(b=>b.addEventListener('click',()=>{S.infAmb=b.dataset.infamb;render();}));
+  document.querySelectorAll('[data-infia]').forEach(b=>b.addEventListener('click',()=>{S.infIA=b.dataset.infia;render();}));
   const w=document.getElementById('inf-word');
   if(w) w.addEventListener('click',()=>{const o=w.textContent;w.disabled=true;w.textContent='⏳ Generando…';
     infWord().then(()=>{w.textContent='✅ Descargado';setTimeout(()=>{w.textContent=o;w.disabled=false;},2200);})
