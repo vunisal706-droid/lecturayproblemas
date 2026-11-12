@@ -425,6 +425,106 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
 .sigwrap{display:flex;flex-wrap:wrap;gap:4px}
 .sigchip{background:rgba(79,126,248,0.11);color:var(--accent);border-radius:7px;padding:2px 7px;
   font-size:11px;font-weight:800;font-family:'Nunito',sans-serif}
+
+/* ── Panel de gráficas ── */
+.gx{display:flex;flex-direction:column;gap:14px}
+.gx .ct{font-size:15px}
+.gx-cts{font-size:11.5px;font-weight:700;color:var(--text3)}
+.gx-p{font-size:12px;color:var(--text3);margin:-4px 0 10px;line-height:1.45}
+.gx-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(max-width:820px){.gx-2col{grid-template-columns:1fr}}
+.gx-herocard{background:linear-gradient(135deg,rgba(226,236,255,.92),rgba(240,231,255,.9) 55%,rgba(223,247,243,.9));overflow:hidden;position:relative}
+.gx-herocard::after{content:"";position:absolute;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(47,111,237,.16),transparent 70%);pointer-events:none}
+.gx-hero{display:grid;grid-template-columns:minmax(190px,260px) 1fr;gap:18px;align-items:center;position:relative;z-index:1}
+@media(max-width:720px){.gx-hero{grid-template-columns:1fr}}
+.gx-hk{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text2)}
+.gx-hv{font-family:'Nunito',sans-serif;font-weight:900;font-size:68px;line-height:1.05;color:#1a2340;letter-spacing:-.02em}
+.gx-hv small{font-size:20px;font-weight:800;color:var(--text3);margin-left:4px}
+.gx-hs{font-size:12px;color:var(--text3);font-weight:600}
+.gx-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:980px){.gx-tiles{grid-template-columns:repeat(2,1fr)}}
+.gx-tile{background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.95);border-radius:14px;padding:12px 13px;box-shadow:0 4px 14px rgba(90,110,170,.10);min-width:0}
+.gx-tk{font-size:11px;font-weight:800;color:var(--text3);margin-bottom:4px}
+.gx-tv{font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;color:var(--text);line-height:1.15}
+.gx-tv small{font-size:13px;font-weight:800;color:var(--text3)}
+.gx-tvs{font-size:15px;line-height:1.2}
+.gx-ts{font-size:11.5px;color:var(--text2);font-weight:700;margin-top:3px}
+.gx-dl{display:inline-block;font-size:11.5px;font-weight:800;border-radius:20px;padding:2px 9px;white-space:nowrap}
+.gx-up{background:#d9f3e3;color:#12703a}.gx-dn{background:#fde3e4;color:#a11d27}.gx-eq{background:#eef1f7;color:#5b6b8c}
+.gx-inds{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media(max-width:640px){.gx-inds{grid-template-columns:repeat(3,1fr)}}
+.gx-ind{text-align:center;padding:8px 2px}
+.gx-ringv{font-family:'Nunito',sans-serif;font-weight:900;font-size:19px;fill:#1a2340}
+.gx-il{font-size:11.5px;font-weight:800;color:var(--text);margin-top:4px;line-height:1.25}
+.gx-il i,.gx-nl i,.gx-heat th i,.gx-ft th i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:baseline}
+.gx-is{margin-top:5px;min-height:20px}
+.gx-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;font-weight:700;color:var(--text2);margin-bottom:12px}
+.gx-leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.gx-legc{background:#fff!important;border:2.5px solid #8a94ad;border-radius:50%!important;box-sizing:border-box}
+.gx-nrow,.gx-crow{display:grid;grid-template-columns:132px 1fr;gap:10px;align-items:center;margin-bottom:9px}
+.gx-crow{grid-template-columns:132px 1fr 62px}
+.gx-nrowg{padding-bottom:10px;margin-bottom:10px;border-bottom:1px dashed rgba(140,160,205,.4)}
+.gx-nl{font-size:12px;font-weight:700;color:var(--text);line-height:1.2}
+.gx-nlc{font-size:13px}
+@media(max-width:520px){.gx-nrow{grid-template-columns:1fr;gap:4px}.gx-crow{grid-template-columns:1fr 62px}.gx-crow .gx-nl{grid-column:1/-1}}
+.gx-stack{display:flex;gap:2px;height:26px;border-radius:8px;overflow:hidden}
+.gx-seg{display:flex;align-items:center;justify-content:center;min-width:16px;color:#fff;font-size:12px;font-weight:900;font-family:'Nunito',sans-serif;border-radius:4px;transform-origin:left}
+.gx-stack.gx-vacia{background:rgba(200,210,230,.3);align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-weight:700}
+.gx-track{position:relative;height:22px;background:linear-gradient(rgba(150,170,210,.22),rgba(150,170,210,.22)) center/100% 4px no-repeat;margin:0 8px}
+.gx-tick{position:absolute;top:5px;bottom:5px;width:1px;background:rgba(120,140,190,.35)}
+.gx-link{position:absolute;top:9px;height:4px;background:rgba(90,107,140,.45);border-radius:2px}
+.gx-dot{position:absolute;top:3px;width:16px;height:16px;border-radius:50%;margin-left:-8px;border:2px solid #fff;box-shadow:0 1px 4px rgba(40,60,110,.3);box-sizing:border-box}
+.gx-dotc{background:#fff;border:3px solid #8a94ad;box-shadow:none}
+.gx-cv{font-size:13px;text-align:right;white-space:nowrap}.gx-cv b{font-weight:900;color:var(--text)}.gx-cv span{color:var(--text3);font-weight:700;margin-left:6px}
+.gx-axis{display:flex;justify-content:space-between;margin:2px 70px 0 142px;font-size:10px;color:var(--text3);font-weight:700}
+@media(max-width:520px){.gx-axis{margin:2px 80px 0 8px}.gx-hc{min-width:34px;padding:6px 2px;font-size:12px}.gx-heat{border-spacing:2px}.gx-heat th{padding:3px 3px;font-size:10.5px}.gx-hv{font-size:56px}}
+.gx-seg2{display:inline-flex;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.9);border-radius:20px;padding:2px}
+.gx-seg2 button{border:0;background:transparent;font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:800;color:var(--text2);padding:5px 12px;border-radius:18px;cursor:pointer}
+.gx-seg2 button.on{background:linear-gradient(135deg,#2f6fed,#6f9bf5);color:#fff;box-shadow:0 3px 9px rgba(47,111,237,.3)}
+.gx-hwrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+.gx-heat{width:100%;border-collapse:separate;border-spacing:3px;font-family:'Nunito',sans-serif}
+.gx-heat th{font-size:11.5px;font-weight:800;color:var(--text2);padding:4px 6px;white-space:nowrap;text-align:center}
+.gx-heat tr>th:first-child{text-align:left;color:var(--text);font-size:12.5px;position:sticky;left:0;background:rgba(246,249,255,.92);border-radius:6px;z-index:1}
+.gx-hc{text-align:center;font-size:13px;font-weight:800;padding:7px 4px;border-radius:7px;min-width:44px}
+.gx-h0{background:rgba(200,210,230,.22);color:var(--text3)}
+.gx-hm{font-weight:900;box-shadow:inset 0 0 0 1.5px rgba(26,35,64,.16)}
+.gx-hn{text-align:center;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap}
+.gx-heat tr[data-gxal]{cursor:pointer}
+.gx-heat tr[data-gxal]:hover .gx-hc,.gx-heat tr.gx-sel .gx-hc{box-shadow:inset 0 0 0 2px #2f6fed}
+.gx-hfoot th,.gx-hfoot td{border-top:0}.gx-hfoot .gx-hc{font-weight:900}
+.gx-hfoot>*{position:relative;top:4px}
+.gx-prow,.gx-rrow{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.8);margin-bottom:6px;font-size:13px}
+.gx-prow{cursor:pointer}.gx-prow:hover{background:rgba(255,255,255,.85)}
+.gx-psg{font-weight:800;color:var(--text);min-width:58px}
+.gx-pch{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.gx-pch em{font-style:normal;font-size:10.5px;font-weight:800;background:#fde3e4;color:#a11d27;border-radius:6px;padding:1px 6px}
+.gx-prow b,.gx-rrow b{font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;min-width:30px;text-align:right}
+.gx-pos{width:21px;height:21px;border-radius:50%;background:rgba(47,111,237,.12);color:#2f6fed;font-size:11px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.gx-pbar,.gx-rbar{flex:1;height:10px;background:rgba(150,170,210,.2);border-radius:5px;overflow:hidden}
+.gx-pbar i,.gx-rbar i{display:block;height:100%;border-radius:5px;background:#22a55b;transform-origin:left}
+.gx-rc{font-weight:900;color:var(--text);min-width:40px}
+.gx-rrow .gx-dl{min-width:62px;text-align:center}
+.gx-nada{font-size:12.5px;color:var(--text3);text-align:center;padding:14px 0}
+.gx-empty{text-align:center;padding:42px 18px}.gx-emo{font-size:44px;margin-bottom:6px}.gx-empty p{font-size:14px;color:var(--text2);line-height:1.6}
+.gx-ficha{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.gx-fwide{grid-column:1/-1}
+@media(max-width:720px){.gx-ficha{grid-template-columns:1fr}}
+.gx-fh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.gx-fsg{font-family:'Nunito',sans-serif;font-weight:900;font-size:24px;color:var(--text)}
+.gx-fm{font-weight:900;font-size:13px;border-radius:20px;padding:4px 12px}
+.gx-ft{width:100%;border-collapse:separate;border-spacing:3px}
+.gx-ft th{font-size:12px;font-weight:800;color:var(--text2);text-align:center;padding:3px 6px}
+.gx-ft tr>th:first-child{text-align:left;white-space:nowrap}
+.gx-ftm th{color:var(--text)}
+.gx-sub{font-size:12px;font-weight:800;color:var(--text2);margin-bottom:6px}
+@keyframes gxGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes gxArc{from{stroke-dasharray:0 var(--gx-c)}}
+@keyframes gxIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.gx-anim>.card,.gx-anim>.gx-2col{animation:gxIn .45s ease both}
+.gx-anim>:nth-child(2){animation-delay:.05s}.gx-anim>:nth-child(3){animation-delay:.1s}.gx-anim>:nth-child(4){animation-delay:.15s}.gx-anim>:nth-child(n+5){animation-delay:.2s}
+.gx-anim .gx-seg,.gx-anim .gx-pbar i,.gx-anim .gx-rbar i{animation:gxGrow .7s cubic-bezier(.2,.8,.2,1) both}
+.gx-anim .gx-arc{animation:gxArc 1s cubic-bezier(.2,.8,.2,1) both}
+@media(prefers-reduced-motion:reduce){.gx-anim *{animation:none!important}}
 </style>
 
 
@@ -592,11 +692,11 @@ main{flex:1;padding:14px 20px 90px;display:flex;flex-direction:column;gap:14px}
 // CONSTANTES
 // ══════════════════════════════════════════════════════════════
 const CATS=[
-  {key:'vl',  label:'Velocidad Lectora',      short:'VL',  color:'#4f7ef8',multi:false},
-  {key:'cl',  label:'Comprensión Lectora',     short:'CL',  color:'#8b5cf6',multi:false},
-  {key:'eo',  label:'Expresión Oral',          short:'EO',  color:'#14b8a6',multi:false},
-  {key:'calc',label:'Cálculo',                 short:'CALC',color:'#f59e0b',multi:true },
-  {key:'rp',  label:'Resolución de Problemas', short:'RP',  color:'#ef4444',multi:true },
+  {key:'vl',  label:'Velocidad Lectora',      short:'VL',  color:'#2f6fed',multi:false},
+  {key:'cl',  label:'Comprensión Lectora',     short:'CL',  color:'#b93cc2',multi:false},
+  {key:'eo',  label:'Expresión Oral',          short:'EO',  color:'#0e9f8e',multi:false},
+  {key:'calc',label:'Cálculo',                 short:'CALC',color:'#dd8a07',multi:true },
+  {key:'rp',  label:'Resolución de Problemas', short:'RP',  color:'#e2453a',multi:true },
 ];
 const TRIMS=['1er Trimestre','2º Trimestre','3er Trimestre'];
 const TS=['1T','2T','3T'];
@@ -717,6 +817,7 @@ function render(){
   if(S.vista==='evolucion'){bindEvol();buildEvolCharts();}
   if(S.vista==='graficas') buildGrafCharts();
   if(S.vista==='resumen')  buildResCharts();
+  if(S.vista==='graficas'||S.vista==='resumen') bindGx();
 }
 
 function renderChips(){
@@ -727,7 +828,7 @@ function renderChips(){
     const b=document.createElement('button');
     b.className='chip'+(id===S.ca?' active':'');
     b.textContent=id;
-    b.onclick=()=>{S.ca=id;S.ae=null;S.agraf={};render();};
+    b.onclick=()=>{S.ca=id;S.ae=null;S.agraf={};S.gxAl=null;render();};
     cc.appendChild(b);
   });
   const tc=document.getElementById('trim-chips');
@@ -827,133 +928,353 @@ function editorAlumno(){
   </div>`;
 }
 
-// ── VIEW GRÁFICAS ─────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// PANEL DE GRÁFICAS (clase) Y RESUMEN (centro)
+// Solo lee los datos: nunca escribe ni borra notas.
+// ══════════════════════════════════════════════════════════════
+const NIV=[
+  {k:'bajo', label:'Menos de 5', ico:'▼', c:'#e5484d', bg:'#fde3e4', tx:'#a11d27'},
+  {k:'medio',label:'De 5 a 6,9', ico:'■', c:'#f0a020', bg:'#fdf0d2', tx:'#8a5300'},
+  {k:'bien', label:'De 7 a 8,9', ico:'●', c:'#3b82f6', bg:'#dfeafe', tx:'#1d4fae'},
+  {k:'top',  label:'9 o más',    ico:'★', c:'#22a55b', bg:'#d9f3e3', tx:'#12703a'},
+];
+function nivel(v){ if(v===null||v===undefined||isNaN(v))return -1; return v>=9?3:v>=7?2:v>=5?1:0; }
+function fx(v,d){ if(v===null||v===undefined||isNaN(v))return '–'; return (+v).toFixed(d===undefined?1:d).replace('.',','); }
+function gxMedia(vs){ const a=vs.filter(v=>v!==null&&v!==undefined&&!isNaN(v)); return a.length?a.reduce((x,y)=>x+y,0)/a.length:null; }
+function gxDeltaChip(d){
+  if(d===null||d===undefined||isNaN(d)) return '';
+  if(Math.abs(d)<0.05) return '<span class="gx-dl gx-eq">= igual</span>';
+  return d>0?`<span class="gx-dl gx-up">▲ +${fx(d)}</span>`:`<span class="gx-dl gx-dn">▼ ${fx(d)}</span>`;
+}
+// Último trimestre con notas (para avisar si el elegido está vacío)
+function gxTrimsConDatos(cids){ return TS.map((_,ti)=>cids.some(cid=>mediaCursoGlobal(cid,ti,'media')!==null)); }
+let _gxKey='';
+function gxAnimCls(){ const k=S.vista+'|'+S.ca+'|'+S.ta+'|'+S.anio; if(k!==_gxKey){_gxKey=k;return ' gx-anim';} return ''; }
+
+function gxLeyendaNiveles(){
+  return `<div class="gx-leg">${NIV.map(n=>`<span><i style="background:${n.c}"></i>${n.ico} ${n.label}</span>`).join('')}</div>`;
+}
+// Barra apilada 100 % con los cuatro niveles
+function gxBarraNiveles(cnt){
+  const tot=cnt.reduce((a,b)=>a+b,0);
+  if(!tot) return '<div class="gx-stack gx-vacia">Sin notas</div>';
+  return `<div class="gx-stack">${cnt.map((n,i)=>n?`<div class="gx-seg" style="flex:${n} 1 0;background:${NIV[i].c}" title="${NIV[i].label}: ${n} (${Math.round(n/tot*100)} %)"><b>${n}</b></div>`:'').join('')}</div>`;
+}
+// Anillo con la media (0–10)
+function gxAnillo(v,color,size){
+  const r=34,c=2*Math.PI*r,p=v===null?0:Math.max(0,Math.min(10,v))/10;
+  return `<svg class="gx-ring" viewBox="0 0 84 84" width="${size||92}" height="${size||92}" role="img" aria-label="Media ${fx(v)} sobre 10">
+    <circle cx="42" cy="42" r="${r}" fill="none" stroke="rgba(120,140,190,.16)" stroke-width="8"/>
+    <circle class="gx-arc" cx="42" cy="42" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
+      stroke-dasharray="${(c*p).toFixed(1)} ${c.toFixed(1)}" style="--gx-c:${c.toFixed(1)}" transform="rotate(-90 42 42)"/>
+    <text x="42" y="47" text-anchor="middle" class="gx-ringv">${fx(v)}</text></svg>`;
+}
+function gxCelda(v){ const l=nivel(v); return l<0?'<td class="gx-hc gx-h0">–</td>':`<td class="gx-hc" style="background:${NIV[l].bg};color:${NIV[l].tx}">${fx(v)}</td>`; }
+function gxVacio(txt){ return `<div class="card glass gx-empty"><div class="gx-emo">📊</div><p>${txt}</p></div>`; }
+
+// ── VIEW GRÁFICAS (mi clase) ──────────────────────────────────
 function viewGraficas(){
   const c=curso();if(!c)return'';
+  const ti=S.ta, cid=S.ca;
   const als=alumnos();
-  const toggles=als.map((al,i)=>{
-    const on=S.agraf[al.id];
-    return`<button class="at${on?' on':''}" data-alid="${al.id}" style="${on?`background:${ACOLS[i%ACOLS.length]};border-color:${ACOLS[i%ACOLS.length]}`:''}">${sigla(al.nombre)}</button>`;
+  const filas=als.map(a=>({a, sg:sigla(a.nombre), v:CATS.map(cat=>notaFinal(c.notas[a.id]?.[ti],cat.key)), m:mediaAlumno(cid,a.id,ti,'media')}));
+  const conNota=filas.filter(f=>f.m!==null);
+  if(!conNota.length){
+    const hay=gxTrimsConDatos([cid]);
+    const otro=hay.findIndex(x=>x);
+    return `<div class="gx${gxAnimCls()}">${gxVacio(`Todavía no hay notas de <b>${cid}</b> en el <b>${TRIMS[ti]}</b>.`+(otro>=0?`<br><button class="btnp" data-gxtrim="${otro}" style="margin-top:12px">Ver el ${TRIMS[otro]}</button>`:'<br>Cuando se apunten en «Notas», aquí aparecerán las gráficas.'))}</div>`;
+  }
+  const mCat=CATS.map(cat=>mediaClase(cid,ti,cat.key));
+  const mCatPrev=ti>0?CATS.map(cat=>mediaClase(cid,ti-1,cat.key)):CATS.map(()=>null);
+  const mCentro=CATS.map(cat=>gxMedia(cursosReales().map(x=>mediaClase(x,ti,cat.key))));
+  const mGlobal=gxMedia(conNota.map(f=>f.m));
+  const mGlobalPrev=ti>0?mediaCursoGlobal(cid,ti-1,'media'):null;
+  const aprob=conNota.filter(f=>f.m>=5).length;
+  const idxOk=mCat.map((v,i)=>v===null?null:i).filter(i=>i!==null);
+  const best=idxOk.length?idxOk.reduce((a,b)=>mCat[b]>mCat[a]?b:a):null;
+  const worst=idxOk.length?idxOk.reduce((a,b)=>mCat[b]<mCat[a]?b:a):null;
+
+  // 1 · cabecera
+  const hero=`<div class="gx-hero">
+    <div class="gx-hmain">
+      <div class="gx-hk">Media de ${cid} · ${TRIMS[ti]}</div>
+      <div class="gx-hv">${fx(mGlobal)}<small>/10</small></div>
+      <div>${gxDeltaChip(mGlobalPrev===null?null:mGlobal-mGlobalPrev)} ${mGlobalPrev===null?'':`<span class="gx-hs">respecto al ${TS[ti-1]}</span>`}</div>
+    </div>
+    <div class="gx-tiles">
+      <div class="gx-tile"><div class="gx-tk">Alumnado con notas</div><div class="gx-tv">${conNota.length}<small> de ${als.length}</small></div></div>
+      <div class="gx-tile"><div class="gx-tk">Con media de 5 o más</div><div class="gx-tv">${Math.round(aprob/conNota.length*100)}<small> %</small></div><div class="gx-ts">${aprob} de ${conNota.length}</div></div>
+      <div class="gx-tile"><div class="gx-tk">⭐ Punto fuerte</div><div class="gx-tv gx-tvs">${best===null?'–':CATS[best].label}</div><div class="gx-ts">media ${best===null?'–':fx(mCat[best])}</div></div>
+      <div class="gx-tile"><div class="gx-tk">🎯 A reforzar</div><div class="gx-tv gx-tvs">${worst===null||worst===best?'–':CATS[worst].label}</div><div class="gx-ts">media ${worst===null||worst===best?'–':fx(mCat[worst])}</div></div>
+    </div>
+  </div>`;
+
+  // 2 · anillos por indicador
+  const anillos=CATS.map((cat,i)=>`<div class="gx-ind">
+      ${gxAnillo(mCat[i],cat.color)}
+      <div class="gx-il"><i style="background:${cat.color}"></i>${cat.label}</div>
+      <div class="gx-is">${gxDeltaChip(mCat[i]===null||mCatPrev[i]===null?null:mCat[i]-mCatPrev[i])||'&nbsp;'}</div>
+    </div>`).join('');
+
+  // 3 · niveles por indicador
+  const niveles=CATS.map((cat,i)=>{
+    const cnt=[0,0,0,0]; filas.forEach(f=>{const l=nivel(f.v[i]); if(l>=0)cnt[l]++;});
+    return `<div class="gx-nrow"><div class="gx-nl"><i style="background:${cat.color}"></i>${cat.label}</div>${gxBarraNiveles(cnt)}</div>`;
   }).join('');
-  const hasInd=als.some(a=>S.agraf[a.id]);
-  const indCharts=hasInd?CATS.map(c=>`<div style="margin-bottom:18px">
-    <div style="font-size:11px;font-weight:800;color:${c.color};margin-bottom:6px;font-family:'Nunito',sans-serif">${c.label}</div>
-    <div class="chart-wrap chart-sm"><canvas id="ind-${c.key}"></canvas></div>
-  </div>`).join(''):`<p style="color:var(--text3);font-size:13px;text-align:center;padding:18px 0">Selecciona alumnos para ver su evolución</p>`;
-  const donuts=CATS.map(cat=>`<div class="dcard">
-    <div class="dl" style="color:${cat.color}">${cat.label}</div>
-    <div style="position:relative;height:150px"><canvas id="don-${cat.key}"></canvas></div>
-  </div>`).join('');
-  return`<div style="display:flex;flex-direction:column;gap:14px">
+  const cntG=[0,0,0,0]; conNota.forEach(f=>cntG[nivel(f.m)]++);
+
+  // 4 · mapa de la clase
+  const orden=S.gxSort||'lista';
+  const fo=[...filas]; if(orden==='media') fo.sort((x,y)=>(y.m===null?-1:y.m)-(x.m===null?-1:x.m));
+  const mapa=fo.map(f=>`<tr data-gxal="${f.a.id}" class="${String(S.gxAl)===String(f.a.id)?'gx-sel':''}"><th>${f.sg}</th>${f.v.map(gxCelda).join('')}${gxCelda(f.m).replace('gx-hc','gx-hc gx-hm')}</tr>`).join('');
+
+  // 5 · clase y centro
+  const hayCentro=cursosReales().filter(x=>x!==cid&&mediaCursoGlobal(x,ti,'media')!==null).length>0;
+  const comp=CATS.map((cat,i)=>{
+    const a=mCat[i], b=mCentro[i];
+    return `<div class="gx-crow"><div class="gx-nl"><i style="background:${cat.color}"></i>${cat.label}</div>
+      <div class="gx-track">
+        ${[2.5,5,7.5].map(x=>`<span class="gx-tick" style="left:${x*10}%"></span>`).join('')}
+        ${a!==null&&b!==null?`<span class="gx-link" style="left:${Math.min(a,b)*10}%;width:${Math.abs(a-b)*10}%"></span>`:''}
+        ${b!==null?`<span class="gx-dot gx-dotc" style="left:${b*10}%" title="Centro: ${fx(b)}"></span>`:''}
+        ${a!==null?`<span class="gx-dot" style="left:${a*10}%;background:${cat.color}" title="${cid}: ${fx(a)}"></span>`:''}
+      </div>
+      <div class="gx-cv"><b>${fx(a)}</b><span>${fx(b)}</span></div></div>`;
+  }).join('');
+
+  // 6 · refuerzo y destacados
+  const refuerzo=conNota.map(f=>({f,bajos:CATS.filter((_,i)=>f.v[i]!==null&&f.v[i]<5)})).filter(x=>x.f.m<5||x.bajos.length>=2).sort((x,y)=>x.f.m-y.f.m);
+  const destacan=[...conNota].filter(f=>f.m>=7).sort((x,y)=>y.m-x.m).slice(0,6);
+  const lRef=refuerzo.length?refuerzo.map(x=>`<div class="gx-prow" data-gxal="${x.f.a.id}"><span class="gx-psg">${x.f.sg}</span><span class="gx-pch">${x.bajos.map(b=>`<em>${b.short}</em>`).join('')}</span><b style="color:${NIV[nivel(x.f.m)].tx}">${fx(x.f.m)}</b></div>`).join(''):'<p class="gx-nada">Nadie con media por debajo de 5 ni con dos indicadores suspensos. 🎉</p>';
+  const lDes=destacan.length?destacan.map((f,i)=>`<div class="gx-prow" data-gxal="${f.a.id}"><span class="gx-pos">${i+1}</span><span class="gx-psg">${f.sg}</span><span class="gx-pbar"><i style="width:${f.m*10}%"></i></span><b style="color:${NIV[nivel(f.m)].tx}">${fx(f.m)}</b></div>`).join(''):'<p class="gx-nada">Todavía nadie alcanza una media de 7.</p>';
+
+  // 7 · ficha del alumno
+  const sel=filas.find(f=>String(f.a.id)===String(S.gxAl))||null;
+  const opts=`<option value="">Elige un alumno o alumna…</option>`+filas.map(f=>`<option value="${f.a.id}"${sel&&String(sel.a.id)===String(f.a.id)?' selected':''}>${f.sg}</option>`).join('');
+  const ficha=sel?`<div class="gx-ficha">
+      <div class="gx-fcol">
+        <div class="gx-fh"><div class="gx-fsg">${sel.sg}</div><div class="gx-fm" style="background:${sel.m===null?'#eef1f7':NIV[nivel(sel.m)].bg};color:${sel.m===null?'#8898bb':NIV[nivel(sel.m)].tx}">Media ${fx(sel.m)}</div></div>
+        <table class="gx-ft"><tr><th></th>${TS.map(t=>`<th>${t}</th>`).join('')}</tr>
+          ${CATS.map(cat=>`<tr><th><i style="background:${cat.color}"></i>${cat.short}</th>${TS.map((_,t)=>gxCelda(notaFinal(c.notas[sel.a.id]?.[t],cat.key))).join('')}</tr>`).join('')}
+          <tr class="gx-ftm"><th>Media</th>${TS.map((_,t)=>gxCelda(mediaAlumno(cid,sel.a.id,t,'media'))).join('')}</tr></table>
+      </div>
+      <div class="gx-fcol"><div class="gx-sub">Su perfil frente a la clase · ${TS[ti]}</div><div class="chart-wrap" style="height:250px"><canvas id="gx-radar"></canvas></div></div>
+      <div class="gx-fcol gx-fwide"><div class="gx-sub">Su evolución por trimestres</div><div class="chart-wrap chart-sm"><canvas id="gx-alline"></canvas></div></div>
+    </div>`:'<p class="gx-nada">Elige a alguien en el desplegable o toca su fila en el mapa de la clase.</p>';
+
+  return `<div class="gx${gxAnimCls()}">
+    <div class="card glass gx-herocard">${hero}</div>
+
     <div class="card glass">
-      <div class="ct">📊 Medias trimestrales — ${S.ca}</div>
-      <div class="chart-wrap"><canvas id="ch-evol"></canvas></div>
+      <div class="ct">🎯 Los cinco indicadores <span class="gx-cts">media de la clase sobre 10 · ${TS[ti]}</span></div>
+      <div class="gx-inds">${anillos}</div>
     </div>
-    <div class="card glass">
-      <div class="ct">🍩 Distribución por nivel — ${TRIMS[S.ta]}</div>
-      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">% de alumnos: 🟢≥9 · 🔵≥7 · 🟡≥5 · 🔴&lt;5</p>
-      <div class="dgrid">${donuts}</div>
+
+    <div class="gx-2col">
+      <div class="card glass">
+        <div class="ct">🚦 ¿En qué nivel está la clase?</div>
+        <p class="gx-p">Número de alumnos y alumnas en cada tramo de nota.</p>
+        ${gxLeyendaNiveles()}
+        <div class="gx-nrow gx-nrowg"><div class="gx-nl"><b>Media global</b></div>${gxBarraNiveles(cntG)}</div>
+        ${niveles}
+      </div>
+      <div class="card glass">
+        <div class="ct">🏫 Mi clase y el centro</div>
+        <p class="gx-p">${hayCentro?'Media de cada indicador en la clase y en todo el centro.':'Aún no hay notas de otros cursos para comparar.'}</p>
+        <div class="gx-leg"><span><i style="background:#2f6fed;border-radius:50%"></i>${cid}</span><span><i class="gx-legc"></i>Centro</span></div>
+        ${comp}
+        <div class="gx-axis"><span>0</span><span>2,5</span><span>5</span><span>7,5</span><span>10</span></div>
+      </div>
     </div>
+
     <div class="card glass">
-      <div class="ct">📈 Comparativa por barras</div>
-      <div class="chart-wrap"><canvas id="ch-barras"></canvas></div>
+      <div class="ct" style="flex-wrap:wrap;row-gap:8px">🗺️ Mapa de la clase <span class="gx-cts">${TRIMS[ti]}</span>
+        <span class="gx-seg2" style="margin-left:auto">
+          <button class="${orden==='lista'?'on':''}" data-gxsort="lista">Orden de lista</button><button class="${orden==='media'?'on':''}" data-gxsort="media">De mayor a menor</button>
+        </span></div>
+      <p class="gx-p">Cada casilla es la nota de un indicador. Toca una fila para ver la ficha.</p>
+      ${gxLeyendaNiveles()}
+      <div class="gx-hwrap"><table class="gx-heat">
+        <tr><th></th>${CATS.map(cat=>`<th title="${cat.label}"><i style="background:${cat.color}"></i>${cat.short}</th>`).join('')}<th>Media</th></tr>
+        ${mapa}
+        <tr class="gx-hfoot"><th>Clase</th>${mCat.map(gxCelda).join('')}${gxCelda(mGlobal).replace('gx-hc','gx-hc gx-hm')}</tr>
+      </table></div>
     </div>
+
+    <div class="gx-2col">
+      <div class="card glass"><div class="ct">🤝 Necesitan refuerzo <span class="gx-cts">${refuerzo.length}</span></div>
+        <p class="gx-p">Media por debajo de 5 o dos indicadores suspensos. Las etiquetas son los indicadores por debajo de 5.</p>${lRef}</div>
+      <div class="card glass"><div class="ct">🌟 Destacan <span class="gx-cts">media de 7 o más</span></div>
+        <p class="gx-p">Las medias más altas de la clase este trimestre.</p>${lDes}</div>
+    </div>
+
     <div class="card glass">
-      <div class="ct">👤 Evolución individual</div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">${toggles}</div>
-      ${indCharts}
+      <div class="ct">📈 Evolución de la clase por trimestres</div>
+      <div class="chart-wrap" style="height:260px"><canvas id="ch-evol"></canvas></div>
+    </div>
+
+    <div class="card glass" id="gx-fichacard">
+      <div class="ct" style="flex-wrap:wrap;row-gap:8px">👤 Ficha individual
+        <select class="minisel" id="gx-selal" style="margin-left:auto;max-width:210px">${opts}</select></div>
+      ${ficha}
     </div>
   </div>`;
 }
 
+const gxFont={family:'Nunito',weight:'700',size:11};
+function gxTooltip(){ return {backgroundColor:'rgba(26,35,64,.94)',padding:10,cornerRadius:10,titleFont:{family:'Nunito',weight:'800',size:12},bodyFont:{family:'Nunito',weight:'600',size:12},boxPadding:4,
+  callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fx(ctx.parsed.r!==undefined?ctx.parsed.r:(ctx.chart.options.indexAxis==='y'?ctx.parsed.x:ctx.parsed.y))}`}}; }
+function gxLineOpts(){ return {responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+  plugins:{legend:{position:'bottom',labels:{font:gxFont,color:'#4a5a80',usePointStyle:true,pointStyle:'circle',boxWidth:8,padding:14}},tooltip:gxTooltip()},
+  scales:{x:{ticks:{color:'#4a5a80',font:{family:'Nunito',weight:'800',size:12}},grid:{display:false}},
+          y:{min:0,max:10,ticks:{stepSize:2.5,color:'#8898bb',font:{family:'Nunito',size:11}},grid:{color:'rgba(150,170,210,0.18)'},border:{display:false}}}}; }
+function gxLineDs(label,data,color,extra){ return Object.assign({label,data,borderColor:color,backgroundColor:color,borderWidth:2.5,pointRadius:5,pointHoverRadius:7,pointBorderColor:'#fff',pointBorderWidth:2,tension:0.3,spanGaps:true,fill:false},extra||{}); }
+
 function buildGrafCharts(){
   const c=curso();if(!c)return;
+  const ti=S.ta, cid=S.ca;
   const elEv=document.getElementById('ch-evol');
   if(elEv){
-    charts.push(new Chart(elEv,{type:'line',data:{labels:TS,datasets:CATS.map(cat=>({
-      label:cat.short,data:TS.map((_,ti)=>mediaClase(S.ca,ti,cat.key)),
-      borderColor:cat.color,borderWidth:2.5,pointRadius:5,pointHoverRadius:7,
-      tension:0.35,fill:false,spanGaps:true,backgroundColor:cat.color+'22',
-    }))},options:gOpts}));
+    charts.push(new Chart(elEv,{type:'line',data:{labels:TRIMS,datasets:[
+      ...CATS.map(cat=>gxLineDs(cat.label,TS.map((_,t)=>mediaClase(cid,t,cat.key)),cat.color)),
+      gxLineDs('Media global',TS.map((_,t)=>mediaCursoGlobal(cid,t,'media')),'#1a2340',{borderDash:[6,5],borderWidth:2,pointRadius:4})
+    ]},options:gxLineOpts()}));
   }
-  const elBar=document.getElementById('ch-barras');
-  if(elBar){
-    charts.push(new Chart(elBar,{type:'bar',data:{labels:TS,datasets:CATS.map(cat=>({
-      label:cat.short,data:TS.map((_,ti)=>mediaClase(S.ca,ti,cat.key)),
-      backgroundColor:cat.color+'bb',borderColor:cat.color,borderWidth:1.5,borderRadius:7,
-    }))},options:gOpts}));
+  const al=(c.alumnos||[]).find(a=>String(a.id)===String(S.gxAl));
+  const er=document.getElementById('gx-radar');
+  if(er&&al){
+    charts.push(new Chart(er,{type:'radar',data:{labels:CATS.map(x=>x.short),datasets:[
+      {label:sigla(al.nombre),data:CATS.map(cat=>notaFinal(c.notas[al.id]?.[ti],cat.key)),borderColor:'#2f6fed',backgroundColor:'rgba(47,111,237,.20)',pointBackgroundColor:'#2f6fed',pointBorderColor:'#fff',pointRadius:4,borderWidth:2.5},
+      {label:'Media de '+cid,data:CATS.map(cat=>mediaClase(cid,ti,cat.key)),borderColor:'#8a94ad',backgroundColor:'rgba(138,148,173,.10)',pointBackgroundColor:'#8a94ad',pointRadius:3,borderWidth:2,borderDash:[5,4]}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{min:0,max:10,ticks:{stepSize:2.5,color:'#8898bb',font:{family:'Nunito',size:9},backdropColor:'transparent'},grid:{color:'rgba(150,170,210,0.25)'},angleLines:{color:'rgba(150,170,210,0.25)'},pointLabels:{color:'#1a2340',font:{family:'Nunito',weight:'800',size:12}}}},
+      plugins:{legend:{position:'bottom',labels:{font:gxFont,color:'#4a5a80',usePointStyle:true,boxWidth:8,padding:12}},tooltip:gxTooltip()}}}));
   }
-  CATS.forEach(cat=>{
-    const el=document.getElementById(`don-${cat.key}`);if(!el)return;
-    const d=distrib(S.ca,S.ta,cat.key);if(!d)return;
-    const tot=d.top+d.bien+d.medio+d.bajo;
-    const pct=v=>tot?Math.round(v/tot*100):0;
-    charts.push(new Chart(el,{type:'doughnut',
-      data:{labels:[`≥9 (${pct(d.top)}%)`,`7-9 (${pct(d.bien)}%)`,`5-7 (${pct(d.medio)}%)`,`<5 (${pct(d.bajo)}%)`],
-        datasets:[{data:[d.top,d.bien,d.medio,d.bajo],backgroundColor:['#22c55e','#3b82f6','#f59e0b','#ef4444'],borderWidth:2,borderColor:'rgba(255,255,255,0.8)'}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
-        plugins:{legend:{position:'bottom',labels:{font:{family:'Nunito',weight:'700',size:9},color:'#4a5a80',boxWidth:10,padding:5}},
-          tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed;const t=ctx.dataset.data.reduce((a,b)=>a+b,0);return t?` ${Math.round(v/t*100)}% (${v} alumnos)`:' 0%';}}}
-        }}
-    }));
-  });
-  const als=alumnos().filter(a=>S.agraf[a.id]);
-  if(als.length){
-    CATS.forEach(cat=>{
-      const el=document.getElementById(`ind-${cat.key}`);if(!el)return;
-      charts.push(new Chart(el,{type:'line',data:{labels:TS,datasets:als.map((al,i)=>({
-        label:sigla(al.nombre),
-        data:TS.map((_,ti)=>{const n=c.notas[al.id]?.[ti];return notaFinal(n,cat.key);}),
-        borderColor:ACOLS[i%ACOLS.length],backgroundColor:ACOLS[i%ACOLS.length]+'22',
-        borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true,
-      }))},options:gOpts}));
-    });
+  const el=document.getElementById('gx-alline');
+  if(el&&al){
+    charts.push(new Chart(el,{type:'line',data:{labels:TRIMS,datasets:CATS.map(cat=>gxLineDs(cat.label,TS.map((_,t)=>notaFinal(c.notas[al.id]?.[t],cat.key)),cat.color))},options:gxLineOpts()}));
   }
 }
 
-// ── VIEW RESUMEN ──────────────────────────────────────────────
+// ── VIEW RESUMEN (todo el centro) ─────────────────────────────
 function viewResumen(){
-  const cids=cursosReales();
-  const catCharts=CATS.map(cat=>`<div class="card glass">
-    <div class="ct"><span style="width:9px;height:9px;border-radius:50%;background:${cat.color};display:inline-block"></span>${cat.label}</div>
-    <div class="chart-wrap"><canvas id="res-${cat.key}"></canvas></div>
-  </div>`).join('');
-  const radares=cids.map(cid=>`<div class="dcard">
-    <div class="dl" style="color:var(--accent)">${cid}</div>
-    <div style="position:relative;height:170px"><canvas id="rad-${cid.replace('º','g')}"></canvas></div>
-  </div>`).join('');
-  return`<div style="display:flex;flex-direction:column;gap:14px">
-    <div class="card glass" style="padding-bottom:8px">
-      <div class="ct">🏫 Perfil por curso — ${TRIMS[S.ta]}</div>
-      <div class="dgrid">${radares}</div>
+  const cids=cursosReales(), ti=S.ta;
+  const trims=`<span class="gx-seg2" style="margin-left:auto">${TS.map((t,i)=>`<button class="${i===ti?'on':''}" data-gxtrim="${i}">${t}</button>`).join('')}</span>`;
+  const porCurso=cids.map(cid=>{
+    const c=S.cursos[cid];
+    const ms=(c.alumnos||[]).map(a=>mediaAlumno(cid,a.id,ti,'media')).filter(v=>v!==null);
+    const cnt=[0,0,0,0]; ms.forEach(m=>cnt[nivel(m)]++);
+    return {cid, n:ms.length, total:(c.alumnos||[]).length, m:gxMedia(ms), prev:ti>0?mediaCursoGlobal(cid,ti-1,'media'):null, cat:CATS.map(cat=>mediaClase(cid,ti,cat.key)), cnt};
+  });
+  const con=porCurso.filter(p=>p.n>0);
+  const cab=`<div class="card glass"><div class="ct" style="margin-bottom:0;flex-wrap:wrap;row-gap:8px">🏫 Resumen del centro <span class="gx-cts">curso ${anioLabel(S.anio)}</span>${trims}</div></div>`;
+  if(!con.length){
+    return `<div class="gx${gxAnimCls()}">${cab}${gxVacio(`Todavía no hay notas en el <b>${TRIMS[ti]}</b>.<br>Elige otro trimestre arriba o espera a que se apunten.`)}</div>`;
+  }
+  const nAl=con.reduce((a,p)=>a+p.n,0), nTot=porCurso.reduce((a,p)=>a+p.total,0);
+  const mCentro=gxMedia(con.map(p=>p.m));
+  const mPrev=ti>0?mediaCentro(ti-1,'media'):null;
+  const cntC=[0,0,0,0]; con.forEach(p=>p.cnt.forEach((n,i)=>cntC[i]+=n));
+  const mCat=CATS.map((cat,i)=>gxMedia(con.map(p=>p.cat[i])));
+  const mCatPrev=ti>0?CATS.map(cat=>gxMedia(cids.map(x=>mediaClase(x,ti-1,cat.key)))):CATS.map(()=>null);
+  const idxOk=mCat.map((v,i)=>v===null?null:i).filter(i=>i!==null);
+  const best=idxOk.length?idxOk.reduce((a,b)=>mCat[b]>mCat[a]?b:a):null;
+  const worst=idxOk.length?idxOk.reduce((a,b)=>mCat[b]<mCat[a]?b:a):null;
+
+  const hero=`<div class="gx-hero">
+    <div class="gx-hmain">
+      <div class="gx-hk">Media del centro · ${TRIMS[ti]}</div>
+      <div class="gx-hv">${fx(mCentro)}<small>/10</small></div>
+      <div>${gxDeltaChip(mPrev===null?null:mCentro-mPrev)} ${mPrev===null?'':`<span class="gx-hs">respecto al ${TS[ti-1]}</span>`}</div>
     </div>
+    <div class="gx-tiles">
+      <div class="gx-tile"><div class="gx-tk">Alumnado con notas</div><div class="gx-tv">${nAl}<small> de ${nTot}</small></div><div class="gx-ts">${con.length} de ${cids.length} cursos</div></div>
+      <div class="gx-tile"><div class="gx-tk">Con media de 5 o más</div><div class="gx-tv">${Math.round((nAl-cntC[0])/nAl*100)}<small> %</small></div><div class="gx-ts">${nAl-cntC[0]} de ${nAl}</div></div>
+      <div class="gx-tile"><div class="gx-tk">⭐ Punto fuerte</div><div class="gx-tv gx-tvs">${best===null?'–':CATS[best].label}</div><div class="gx-ts">media ${best===null?'–':fx(mCat[best])}</div></div>
+      <div class="gx-tile"><div class="gx-tk">🎯 A reforzar</div><div class="gx-tv gx-tvs">${worst===null||worst===best?'–':CATS[worst].label}</div><div class="gx-ts">media ${worst===null||worst===best?'–':fx(mCat[worst])}</div></div>
+    </div></div>`;
+
+  const anillos=CATS.map((cat,i)=>`<div class="gx-ind">${gxAnillo(mCat[i],cat.color)}
+      <div class="gx-il"><i style="background:${cat.color}"></i>${cat.label}</div>
+      <div class="gx-is">${gxDeltaChip(mCat[i]===null||mCatPrev[i]===null?null:mCat[i]-mCatPrev[i])||'&nbsp;'}</div></div>`).join('');
+
+  const heat=porCurso.map(p=>`<tr><th>${p.cid}</th>${p.cat.map(gxCelda).join('')}${gxCelda(p.m).replace('gx-hc','gx-hc gx-hm')}<td class="gx-hn">${p.n}/${p.total}</td></tr>`).join('');
+
+  const rank=[...con].sort((a,b)=>b.m-a.m).map((p,i)=>`<div class="gx-rrow"><span class="gx-pos">${i+1}</span><span class="gx-rc">${p.cid}</span>
+      <span class="gx-rbar"><i style="width:${p.m*10}%;background:${NIV[nivel(p.m)].c}"></i></span><b>${fx(p.m)}</b>${gxDeltaChip(p.prev===null?null:p.m-p.prev)}</div>`).join('');
+
+  const niveles=porCurso.map(p=>`<div class="gx-nrow"><div class="gx-nl gx-nlc"><b>${p.cid}</b></div>${gxBarraNiveles(p.cnt)}</div>`).join('');
+
+  const radares=con.map(p=>`<div class="dcard"><div class="dl" style="color:var(--text)">${p.cid} <span style="color:var(--text3);font-weight:700">· ${fx(p.m)}</span></div>
+    <div style="position:relative;height:170px"><canvas id="rad-${cids.indexOf(p.cid)}"></canvas></div></div>`).join('');
+
+  const catCharts=CATS.map(cat=>`<div class="card glass"><div class="ct"><span style="width:10px;height:10px;border-radius:50%;background:${cat.color};display:inline-block"></span>${cat.label} <span class="gx-cts">por curso y trimestre</span></div>
+    <div class="chart-wrap"><canvas id="res-${cat.key}"></canvas></div></div>`).join('');
+
+  return `<div class="gx${gxAnimCls()}">
+    ${cab}
+    <div class="card glass gx-herocard">${hero}</div>
+    <div class="card glass"><div class="ct">🎯 Los cinco indicadores <span class="gx-cts">media del centro sobre 10 · ${TS[ti]}</span></div><div class="gx-inds">${anillos}</div></div>
+
+    <div class="card glass">
+      <div class="ct">🗺️ Mapa del centro <span class="gx-cts">media de cada curso por indicador · ${TS[ti]}</span></div>
+      ${gxLeyendaNiveles()}
+      <div class="gx-hwrap"><table class="gx-heat">
+        <tr><th></th>${CATS.map(cat=>`<th title="${cat.label}"><i style="background:${cat.color}"></i>${cat.short}</th>`).join('')}<th>Media</th><th>Con notas</th></tr>
+        ${heat}
+        <tr class="gx-hfoot"><th>Centro</th>${mCat.map(gxCelda).join('')}${gxCelda(mCentro).replace('gx-hc','gx-hc gx-hm')}<td class="gx-hn">${nAl}/${nTot}</td></tr>
+      </table></div>
+    </div>
+
+    <div class="gx-2col">
+      <div class="card glass"><div class="ct">🏅 Cursos por media global</div><p class="gx-p">De mayor a menor media en el ${TRIMS[ti]}.</p>${rank}</div>
+      <div class="card glass"><div class="ct">🚦 Niveles en cada curso</div><p class="gx-p">Alumnado de cada curso según su media global.</p>${gxLeyendaNiveles()}
+        <div class="gx-nrow gx-nrowg"><div class="gx-nl gx-nlc"><b>Centro</b></div>${gxBarraNiveles(cntC)}</div>${niveles}</div>
+    </div>
+
+    <div class="card glass"><div class="ct">📈 Evolución del centro por trimestres</div><div class="chart-wrap" style="height:260px"><canvas id="gx-centro"></canvas></div></div>
+
+    <div class="card glass" style="padding-bottom:8px"><div class="ct">🕸️ Perfil de cada curso <span class="gx-cts">${TS[ti]}</span></div><div class="dgrid">${radares}</div></div>
     ${catCharts}
   </div>`;
 }
 
 function buildResCharts(){
-  const cids=cursosReales();
-  const colors=['#4f7ef8','#8b5cf6','#14b8a6','#f59e0b','#ef4444','#22c55e'];
+  const cids=cursosReales(), ti=S.ta;
+  const colors=['#2f6fed','#b93cc2','#0e9f8e','#dd8a07','#e2453a','#5b6b8c','#7a5af8','#0891b2'];
+  const ec=document.getElementById('gx-centro');
+  if(ec){
+    charts.push(new Chart(ec,{type:'line',data:{labels:TRIMS,datasets:[
+      ...CATS.map(cat=>gxLineDs(cat.label,TS.map((_,t)=>gxMedia(cids.map(x=>mediaClase(x,t,cat.key)))),cat.color)),
+      gxLineDs('Media global',TS.map((_,t)=>mediaCentro(t,'media')),'#1a2340',{borderDash:[6,5],borderWidth:2,pointRadius:4})
+    ]},options:gxLineOpts()}));
+  }
   cids.forEach((cid,ci)=>{
-    const key=cid.replace('º','g');
-    const el=document.getElementById(`rad-${key}`);if(!el)return;
-    const vals=CATS.map(cat=>mediaClase(cid,S.ta,cat.key)??0);
+    const el=document.getElementById(`rad-${ci}`);if(!el)return;
+    const col=colors[ci%colors.length];
     charts.push(new Chart(el,{type:'radar',
-      data:{labels:CATS.map(c=>c.short),datasets:[{label:cid,data:vals,borderColor:colors[ci%colors.length],backgroundColor:colors[ci%colors.length]+'28',pointBackgroundColor:colors[ci%colors.length],borderWidth:2}]},
+      data:{labels:CATS.map(c=>c.short),datasets:[{label:cid,data:CATS.map(cat=>mediaClase(cid,ti,cat.key)),borderColor:col,backgroundColor:col+'2e',pointBackgroundColor:col,pointBorderColor:'#fff',borderWidth:2}]},
       options:{responsive:true,maintainAspectRatio:false,
-        scales:{r:{min:0,max:10,ticks:{color:'#8898bb',font:{family:'Nunito',size:9},stepSize:2,backdropColor:'transparent'},grid:{color:'rgba(150,170,210,0.2)'},pointLabels:{color:'#4a5a80',font:{family:'Nunito',weight:'700',size:10}}}},
-        plugins:{legend:{display:false}}
-      }
-    }));
+        scales:{r:{min:0,max:10,ticks:{color:'#8898bb',font:{family:'Nunito',size:9},stepSize:2.5,backdropColor:'transparent'},grid:{color:'rgba(150,170,210,0.22)'},pointLabels:{color:'#4a5a80',font:{family:'Nunito',weight:'800',size:10}}}},
+        plugins:{legend:{display:false},tooltip:gxTooltip()}}}));
   });
   CATS.forEach(cat=>{
     const el=document.getElementById(`res-${cat.key}`);if(!el)return;
-    const ds=cids.map((cid,i)=>({
-      label:cid,data:TS.map((_,ti)=>mediaClase(cid,ti,cat.key)),
-      backgroundColor:colors[i%colors.length]+'bb',borderColor:colors[i%colors.length],borderWidth:1.5,borderRadius:6,
-    }));
-    charts.push(new Chart(el,{type:'bar',data:{labels:TS,datasets:ds},options:gOpts}));
+    const o=gxLineOpts(); o.interaction={mode:'nearest',intersect:true};
+    charts.push(new Chart(el,{type:'bar',data:{labels:TRIMS,datasets:cids.map((cid,i)=>({
+      label:cid,data:TS.map((_,t)=>mediaClase(cid,t,cat.key)),backgroundColor:colors[i%colors.length],borderRadius:5,borderSkipped:'bottom',maxBarThickness:26,categoryPercentage:0.75,barPercentage:0.86,
+    }))},options:o}));
   });
+}
+
+// ── eventos del panel ─────────────────────────────────────────
+function bindGx(){
+  document.querySelectorAll('[data-gxtrim]').forEach(b=>b.addEventListener('click',()=>{S.ta=+b.dataset.gxtrim;render();}));
+  document.querySelectorAll('[data-gxsort]').forEach(b=>b.addEventListener('click',()=>{S.gxSort=b.dataset.gxsort;render();}));
+  const irFicha=()=>{const f=document.getElementById('gx-fichacard'); if(f) f.scrollIntoView({behavior:'smooth',block:'start'});};
+  document.querySelectorAll('[data-gxal]').forEach(r=>r.addEventListener('click',()=>{S.gxAl=+r.dataset.gxal||r.dataset.gxal;render();irFicha();}));
+  const s=document.getElementById('gx-selal');
+  if(s) s.addEventListener('change',()=>{S.gxAl=s.value===''?null:(+s.value||s.value);render();});
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2006,10 +2327,9 @@ function mediaCentro(ti,catKey){
 function delta(a,b){ if(a===null||b===null)return null; return b-a; }
 function flecha(d){
   if(d===null)return '<span class="dl0">—</span>';
-  if(d>=0.5) return `<span class="dlup">▲ +${d.toFixed(1)}</span>`;
-  if(d>0)    return `<span class="dlup">▲ +${d.toFixed(1)}</span>`;
-  if(d===0)  return '<span class="dl0">= 0,0</span>';
-  return `<span class="dldn">▼ ${d.toFixed(1)}</span>`;
+  if(Math.abs(d)<0.05) return '<span class="dl0">= igual</span>';
+  if(d>0) return `<span class="dlup">▲ +${fx(d)}</span>`;
+  return `<span class="dldn">▼ ${fx(d)}</span>`;
 }
 
 function viewEvolucion(){
@@ -2025,7 +2345,7 @@ function viewEvolucion(){
   const dCentro=delta(mc[0],mc[2]);
   const kpis=TS.map((t,i)=>`<div class="kpi">
       <div class="kl">${TRIMS[i]}</div>
-      <div class="kv">${mc[i]===null?'—':fmt(mc[i])}</div>
+      <div class="kv">${mc[i]===null?'—':fx(mc[i])}</div>
     </div>`).join('')+
     `<div class="kpi kpid"><div class="kl">Progreso 1T → 3T</div><div class="kv">${flecha(dCentro)}</div></div>`;
 
@@ -2035,7 +2355,7 @@ function viewEvolucion(){
     const v=TS.map((_,ti)=>mediaCursoGlobal(cid,ti,cat));
     const d=delta(v[0],v[2]);
     return `<tr><td><b>${cid}</b></td>
-      ${v.map(x=>`<td class="tc">${x===null?'—':fmt(x)}</td>`).join('')}
+      ${v.map(x=>`<td class="tc">${x===null?'—':fx(x)}</td>`).join('')}
       <td class="tc">${flecha(d)}</td></tr>`;
   }).join('')||`<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px">Sin cursos todavía</td></tr>`;
 
@@ -2047,7 +2367,7 @@ function viewEvolucion(){
     return {nombre:sigla(a.nombre),v,d};
   }).sort((x,y)=>(y.d===null?-99:y.d)-(x.d===null?-99:x.d));
   const tablaAl=filasAl.map(f=>`<tr><td>${f.nombre}</td>
-      ${f.v.map(x=>`<td class="tc">${x===null?'—':fmt(x)}</td>`).join('')}
+      ${f.v.map(x=>`<td class="tc">${x===null?'—':fx(x)}</td>`).join('')}
       <td class="tc">${flecha(f.d)}</td></tr>`).join('')
     ||`<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:14px">Sin alumnos en ${S.ca}</td></tr>`;
 
@@ -2088,33 +2408,35 @@ function viewEvolucion(){
 
 function buildEvolCharts(){
   const cat=S.evoCat||'media';
-  const color=cat==='media'?'#4f7ef8':CATS.find(c=>c.key===cat).color;
+  const color=cat==='media'?'#2f6fed':CATS.find(c=>c.key===cat).color;
+  const pal=['#2f6fed','#b93cc2','#0e9f8e','#dd8a07','#e2453a','#5b6b8c','#7a5af8','#0891b2'];
 
   const e1=document.getElementById('evo-centro');
-  if(e1) charts.push(new Chart(e1,{type:'line',data:{labels:TRIMS,datasets:[{
-      label:'Media del centro', data:TS.map((_,ti)=>mediaCentro(ti,cat)),
-      borderColor:color, backgroundColor:color+'26', borderWidth:3, pointRadius:6,
-      tension:0.35, fill:true, spanGaps:true,
-    }]},options:gOpts}));
+  if(e1){
+    const o=gxLineOpts(); o.plugins.legend.display=false;
+    charts.push(new Chart(e1,{type:'line',data:{labels:TRIMS,datasets:[
+      gxLineDs('Media del centro',TS.map((_,ti)=>mediaCentro(ti,cat)),color,{borderWidth:3,pointRadius:6,fill:true,backgroundColor:color+'22'})
+    ]},options:o}));
+  }
 
   const cids=cursosReales();
   const e2=document.getElementById('evo-cursos');
-  if(e2) charts.push(new Chart(e2,{type:'line',data:{labels:TRIMS,datasets:cids.map((cid,i)=>({
-      label:cid, data:TS.map((_,ti)=>mediaCursoGlobal(cid,ti,cat)),
-      borderColor:ACOLS[i%ACOLS.length], backgroundColor:ACOLS[i%ACOLS.length]+'22',
-      borderWidth:2.5, pointRadius:4, tension:0.3, spanGaps:true, fill:false,
-    }))},options:gOpts}));
+  if(e2) charts.push(new Chart(e2,{type:'line',data:{labels:TRIMS,datasets:cids.map((cid,i)=>
+      gxLineDs(cid,TS.map((_,ti)=>mediaCursoGlobal(cid,ti,cat)),pal[i%pal.length]))},options:gxLineOpts()}));
 
   const als=alumnos();
   const e3=document.getElementById('evo-alumnos');
   if(e3&&als.length){
-    const datos=als.map(a=>({n:a.nombre,d:delta(mediaAlumno(S.ca,a.id,0,cat),mediaAlumno(S.ca,a.id,2,cat))}))
+    const datos=als.map(a=>({n:sigla(a.nombre),d:delta(mediaAlumno(S.ca,a.id,0,cat),mediaAlumno(S.ca,a.id,2,cat))}))
                    .filter(x=>x.d!==null).sort((a,b)=>b.d-a.d);
+    if(!datos.length){ e3.parentElement.style.display='none'; return; }
+    const o=gxLineOpts(); o.plugins.legend.display=false; o.interaction={mode:'nearest',intersect:true};
+    o.scales.y={beginAtZero:true,ticks:{color:'#8898bb',font:{family:'Nunito',size:11},callback:v=>fx(v)},grid:{color:'rgba(150,170,210,0.18)'},border:{display:false}};
+    o.scales.x.ticks.font={family:'Nunito',weight:'700',size:10};
     charts.push(new Chart(e3,{type:'bar',data:{labels:datos.map(x=>x.n),datasets:[{
         label:'Progreso 1T → 3T', data:datos.map(x=>x.d),
-        backgroundColor:datos.map(x=>x.d>=0?'#22c55ebb':'#ef4444bb'),
-        borderColor:datos.map(x=>x.d>=0?'#16a34a':'#dc2626'), borderWidth:1.5, borderRadius:6,
-      }]},options:{...gOpts, scales:{...gOpts.scales, y:{...(gOpts.scales?.y||{}), min:undefined, max:undefined, beginAtZero:true}}}}));
+        backgroundColor:datos.map(x=>x.d>=0?'#22a55b':'#e5484d'), borderRadius:5, maxBarThickness:34,
+      }]},options:o}));
   }
 }
 
@@ -2674,23 +2996,13 @@ document.getElementById('sn-modal').addEventListener('click',e=>{if(e.target.id=
 
 // ── Aviso de novedades (sale una sola vez en cada dispositivo) ──
 (function(){
-  const ID='2026-10-22d';
+  const ID='2026-11-12-graficas';
   try{ if(localStorage.getItem('capi_lyp_novedades')===ID) return; }catch(e){}
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px';
   d.innerHTML=`<div style="background:#fff;max-width:440px;width:100%;border-radius:18px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:Nunito,sans-serif;color:#1a2340">
     <div style="font-size:18px;font-weight:900;margin-bottom:8px">✨ Novedades</div>
-    <ul style="font-size:13.5px;line-height:1.55;margin:0 0 14px;padding-left:18px">
-      <li>En <b>Evolución</b> y <b>Resumen</b> el curso «Demo» ya no cuenta en las medias del centro, y si no hay notas no sale gráfica.</li>
-      <li>Nuevo botón <b>📄 Subir notas (Word/PDF)</b> en Notas: sube la hoja de registro rellena y la app pone las notas sola.</li>
-      <li>La lista de alumnado se ordena por el <b>primer apellido</b> (2.ª letra de las siglas), como en Séneca.</li>
-      <li>Nuevo botón <b>🗑 Borrar alumno</b> en cada fila y en su ficha, por si alguien se da de baja.</li>
-      <li>Cálculo y Problemas tienen <b>Parte 1 y Parte 2</b>: dos hojas que se pasan en dos sesiones y dan la <b>Nota 1</b> y la <b>Nota 2</b> en la app. Lo explica la guía del maestro/a.</li>
-      <li>Cada prueba se descarga en <b>dos documentos</b>: <b>cuadernillo del alumnado</b> (para fotocopiar) y <b>cuadernillo del maestro/a</b> (guía, soluciones y registro).</li>
-      <li>Puedes descargar <b>un trimestre</b> o <b>los tres juntos</b>.</li>
-      <li>Nuevas pruebas de <b>Cálculo</b> y de <b>Resolución de problemas</b> para cada curso y trimestre.</li>
-      <li>Los documentos llevan el <b>logo del colegio</b>.</li>
-    </ul>
+    <p style="font-size:13.5px;line-height:1.55;margin:0 0 14px">Nuevas <b>📊 Gráficas</b> de tu clase y nuevo <b>🏫 Resumen</b> del centro: medias, niveles, mapa de la clase y ficha de cada alumno. Las puede ver todo el profesorado.</p>
     <button style="width:100%;border:none;border-radius:12px;padding:10px;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(135deg,#4f7ef8,#7c9edf);cursor:pointer">Entendido</button></div>`;
   d.querySelector('button').onclick=()=>{try{localStorage.setItem('capi_lyp_novedades',ID)}catch(e){} d.remove();};
   document.body.appendChild(d);
