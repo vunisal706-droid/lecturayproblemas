@@ -1769,8 +1769,7 @@ function infImprimir(){
     '.ifin{font-family:"Segoe UI",system-ui,sans-serif;font-size:7.5pt;color:#7b8794;border-top:1px solid #dde3e6;padding-top:5pt;margin-top:14pt;display:flex;justify-content:space-between}'+
     '</style></head><body>'+infHTML(d)+
     '<div class="ifin"><span>'+infEsc(pie)+'</span><span>Datos del alumnado por siglas</span></div>'+
-    '<script src="clave-propia.js" data-idea="lgIdea" data-mod="10.12.0"></script>
-</body></html>');
+    '</body></html>');
   w.document.close();
   setTimeout(()=>{w.focus();w.print();},500);
 }
@@ -3553,5 +3552,6 @@ document.getElementById('sn-modal').addEventListener('click',e=>{if(e.target.id=
   document.body.appendChild(d);
 })();
 </script>
+<script src="clave-propia.js" data-idea="lgIdea" data-mod="10.12.0"></script>
 </body>
 </html>
